@@ -17,7 +17,7 @@ def process_data(file: UploadFile) -> List[CampsiteDTO]:
         file (UploadFile): file uploaded via API
 
     Returns:
-        processed_campsites (List[CampsiteDTO]): phone number as string 
+        processed_campsites (List[CampsiteDTO]): phone number as string
             of numbers only (or None)
     """
     raw_rows = []

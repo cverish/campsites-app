@@ -1,6 +1,6 @@
 # Campsites App
 
-** Currently a WIP, backend-only. Frontend to come ✨ **
+**Currently a WIP, backend-only. Frontend to come** ✨
 
 A full-stack application for exploring public campsites across the US and Canada.
 
@@ -15,8 +15,10 @@ In the root directory, run
 
 to build and start the backend services.
 
-** You will need to mamually run the alembic migration ** (on the list to fix):
+**You will need to mamually run the alembic migration** (on the list to fix):
+
 `make bash`
+
 `make db-upgrade`
 
 After doing so, you may need to restart the docker services.

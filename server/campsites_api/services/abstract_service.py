@@ -59,7 +59,7 @@ class AbstractService(Generic[ModelType, ModelTypeDTO]):
             raise HTTPException(status_code=404, detail=f"Item with id {id} not found")
         for key, value in item.dict().items():
             # we want to ensure we are not overwriting the ID
-            if (key != "id"):
+            if key != "id":
                 setattr(db_item, key, value)
         self.session.commit()
         return db_item
