@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  server:
+    build: ./server
+    container_name: campsites_server
+    ports:
+      - "8000:8000"
+    command: uvicorn --reload --host 0.0.0.0 --port 8000 campsites_api.main:app
+    volumes:
+      - .:/workspace:z
+    depends_on:
+        - db
+    environment:
+      DB_PORT: campsites_postgresql
+      DATABASE_URI: "postgresql://postgres:postgres@campsites_postgresql/postgres"
+    networks:
+      - campsites
+  
+  db:
+    image: postgres:13
+    container_name: campsites_postgresql
+    ports:
+      - "5555:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "postgres"
+    networks:
+      - campsites
+
+networks:
+  campsites:
