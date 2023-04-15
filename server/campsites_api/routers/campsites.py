@@ -1,25 +1,24 @@
-from typing import List, Optional
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from pydantic import UUID4
 
+from campsites_api.dto import CampsiteDTO, CampsiteFilterDTO
 from campsites_api.services.campsites_service import (
     CampsitesService,
     get_campsites_service,
 )
 from campsites_api.utils.process_data import process_data
-from campsites_api.dto import CampsiteDTO
-
 
 router = APIRouter(prefix="/campsites")
 
 
 @router.get("", response_model=List[CampsiteDTO])
 async def list_campsites(
+    filters: CampsiteFilterDTO = Depends(CampsiteFilterDTO.parser),
     campsites_service: CampsitesService = Depends(get_campsites_service),
-    limit: Optional[int] = 25,
-    offset: Optional[int] = 0,
 ):
-    return campsites_service.list(limit, offset)
+    return campsites_service.list(filters)
 
 
 @router.post("/upload")
@@ -47,7 +46,7 @@ async def get_campsite(
     try:
         campsite = campsites_service.get(campsite_uuid4)
         return campsite
-    except:
+    except Exception:
         raise HTTPException(status_code=404, detail="Not found")
 
 

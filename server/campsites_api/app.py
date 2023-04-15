@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+
 from campsites_api.routers import campsites
 
 

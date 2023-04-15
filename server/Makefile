@@ -10,6 +10,17 @@ requirements-test:
 build: env
 	docker build . -t campsites-api
 
+black:
+	black .
+
+isort:
+	isort .
+
+flake8:
+	flake8
+
+lint: flake8 isort black
+
 db-current:
 	alembic current
 

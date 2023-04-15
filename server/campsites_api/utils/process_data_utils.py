@@ -80,6 +80,36 @@ def process_dates(date_open_str: Union[str, None]) -> dict:
     return dates_dict
 
 
+def process_country(state_str: str) -> str:
+    """
+    takes in a string representation of a state or province and returns
+    the country. Only compares against the list of Canadian provinces
+    because it is either Canada OR United States
+
+    Parameters:
+        state_str (str | None): 2-character string representing state or province
+
+    Returns:
+        country (str): country ("United States" or "Canada")
+    """
+    canadian_provinces = [
+        "AB",
+        "BC",
+        "MB",
+        "NB",
+        "NL",
+        "NT",
+        "NS",
+        "NU",
+        "ON",
+        "PE",
+        "QC",
+        "SK",
+        "YT",
+    ]
+    return "CAN" if state_str in canadian_provinces else "USA"
+
+
 def process_amenities(amenity_str: Union[str, None]) -> dict:
     """
     processes the raw string of amenity codes into a dictionary.

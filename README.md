@@ -15,7 +15,7 @@ In the root directory, run
 
 to build and start the backend services.
 
-**You will need to mamually run the alembic migration** (on the list to fix):
+**You will need to manually run the alembic migration** (on the list to fix):
 
 `make bash`
 
@@ -23,13 +23,13 @@ to build and start the backend services.
 
 After doing so, you may need to restart the docker services.
 
-The API is accessible at `localhost:8000`.
+The API is accessible at `localhost:8000`. To view the Swagger docs, visit `localhost:8000/docs` in your browser.
 
-Data can be uploaded via the `/campsites/upload` endpoint; CSV data files can be found in `/campsites_db/data`. The data in these CSVs has been very mildly cleaned from the source data, so I recommend you use this.
+Data can be uploaded via the `/campsites/upload` endpoint; CSV data files can be found in `/campsites_db/data`. The data in these CSVs has been very mildly cleaned from the source data, so I recommend you use these files.
 
 ## TODO
 - [ ] apply alembic migration automatically in the docker container
-- [ ] backend campsite filtering and sorting
+- [x] backend campsite filtering and sorting
 - [ ] frontend
 - [ ] tests
 - [ ] linting

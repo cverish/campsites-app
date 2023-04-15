@@ -57,12 +57,15 @@ def process_data(file: UploadFile) -> List[CampsiteDTO]:
         dates = ut.process_dates(row["dates_open"])
         row = row | dates
 
+        # country
+        row["country"] = ut.process_country(row["state"])
+
         # amenities
         amenities = ut.process_amenities(row["amenities"])
         row = row | amenities
         try:
             processed_campsites.append(CampsiteDTO(**row))
-        except:
+        except Exception:
             raise HTTPException(status_code=422, detail="CSV file in incorrect format.")
 
     file.file.close()

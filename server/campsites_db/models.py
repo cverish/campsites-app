@@ -1,10 +1,16 @@
-from enum import Enum
 import uuid
+from enum import Enum
+
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
+
+
+class CampsiteCountryEnum(str, Enum):
+    CAN = "CAN"
+    USA = "USA"
 
 
 class CampsiteTypeEnum(str, Enum):
@@ -64,6 +70,7 @@ class Campsite(Base):
     code = sa.Column(sa.String, nullable=True)
     name = sa.Column(sa.String, nullable=False)
     state = sa.Column(sa.String, nullable=False)
+    country = sa.Column(sa.Enum(CampsiteCountryEnum), nullable=False)
     campsite_type = sa.Column(sa.Enum(CampsiteTypeEnum), nullable=True)
     lon = sa.Column(sa.DOUBLE_PRECISION, nullable=False)
     lat = sa.Column(sa.DOUBLE_PRECISION, nullable=False)

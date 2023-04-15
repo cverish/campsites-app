@@ -5,10 +5,9 @@ Revises:
 Create Date: 2023-03-12 18:24:06.877618
 
 """
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql as ps
-
 
 # revision identifiers, used by Alembic.
 revision = "79e7e8b01bfb"
@@ -21,6 +20,8 @@ def upgrade() -> None:
     # manual commands
 
     # creating enums
+    campsite_country_enum = ps.ENUM("CAN", "USA", name="campsite_country_enum")
+
     campsite_type_enum = ps.ENUM(
         "AMC",
         "AUTH",
@@ -68,6 +69,7 @@ def upgrade() -> None:
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column("code", sa.String(), nullable=True),
         sa.Column("name", sa.String(), nullable=False),
+        sa.Column("country", campsite_country_enum, nullable=False),
         sa.Column("state", sa.String(), nullable=False),
         sa.Column("campsite_type", campsite_type_enum, nullable=True),
         sa.Column("lon", sa.DOUBLE_PRECISION(), nullable=False),
@@ -105,6 +107,7 @@ def downgrade() -> None:
     # ### end Alembic commands ###
     # manual enum drops
     bind = op.get_bind()
+    sa.Enum(name="campsite_country_enum").drop(bind, checkfirst=False)
     sa.Enum(name="campsite_type_enum").drop(bind, checkfirst=False)
     sa.Enum(name="bearing_enum").drop(bind, checkfirst=False)
     sa.Enum(name="toilet_type_enum").drop(bind, checkfirst=False)
