@@ -23,18 +23,18 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
 
     The name of the filters may contain a modifier at the end, preceded with two
     underscores. Allowed modifiers:
-        __lt: filter by values less than a given value
-        __lte: filter by values less than or equal to a given value
-        __
+        __lt: filter by values less than or equal to a given value
+        __gt: filter by values greater than or equal to a given value
+        __ct: filter by string values containing given substring
 
-    Filter names must exactly match the column name.
+    Filter names (not including modifier with underscores) must exactly match the column name.
 
     Parameters:
-        file (UploadFile): file uploaded via API
+        query (Query): sqlalchemy query object
+        filters (FilterTypeDTO): filter object
 
     Returns:
-        processed_campsites (List[CampsiteDTO]): phone number as string
-            of numbers only (or None)
+        query (Query): sqlalchemy query object with filters applied
     """
 
     def __filter(self, query: Query, filters: FilterTypeDTO):
