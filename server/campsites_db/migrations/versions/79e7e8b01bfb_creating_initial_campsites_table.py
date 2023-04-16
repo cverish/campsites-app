@@ -20,6 +20,74 @@ def upgrade() -> None:
     # manual commands
 
     # creating enums
+    campsite_state_enum = ps.ENUM(
+        "AK",
+        "AL",
+        "AR",
+        "AZ",
+        "CA",
+        "CO",
+        "CT",
+        "DC",
+        "DE",
+        "FL",
+        "GA",
+        "HI",
+        "IA",
+        "ID",
+        "IL",
+        "IN",
+        "KS",
+        "KY",
+        "LA",
+        "MA",
+        "MD",
+        "ME",
+        "MI",
+        "MN",
+        "MO",
+        "MS",
+        "MT",
+        "NC",
+        "ND",
+        "NE",
+        "NH",
+        "NJ",
+        "NM",
+        "NV",
+        "NY",
+        "OH",
+        "OK",
+        "OR",
+        "PA",
+        "RI",
+        "SC",
+        "SD",
+        "TN",
+        "TX",
+        "UT",
+        "VA",
+        "VT",
+        "WA",
+        "WI",
+        "WV",
+        "WY",
+        "AB",
+        "BC",
+        "MB",
+        "NB",
+        "NL",
+        "NT",
+        "NS",
+        "NU",
+        "ON",
+        "PE",
+        "QC",
+        "SK",
+        "YT",
+        name="campsite_state_enum",
+    )
+
     campsite_country_enum = ps.ENUM("CAN", "USA", name="campsite_country_enum")
 
     campsite_type_enum = ps.ENUM(
@@ -70,7 +138,7 @@ def upgrade() -> None:
         sa.Column("code", sa.String(), nullable=True),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("country", campsite_country_enum, nullable=False),
-        sa.Column("state", sa.String(), nullable=False),
+        sa.Column("state", campsite_state_enum, nullable=False),
         sa.Column("campsite_type", campsite_type_enum, nullable=True),
         sa.Column("lon", sa.DOUBLE_PRECISION(), nullable=False),
         sa.Column("lat", sa.DOUBLE_PRECISION(), nullable=False),
@@ -107,6 +175,7 @@ def downgrade() -> None:
     # ### end Alembic commands ###
     # manual enum drops
     bind = op.get_bind()
+    sa.Enum(name="campsite_state_enum").drop(bind, checkfirst=False)
     sa.Enum(name="campsite_country_enum").drop(bind, checkfirst=False)
     sa.Enum(name="campsite_type_enum").drop(bind, checkfirst=False)
     sa.Enum(name="bearing_enum").drop(bind, checkfirst=False)

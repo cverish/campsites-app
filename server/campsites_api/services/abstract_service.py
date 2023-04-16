@@ -1,4 +1,4 @@
-from typing import Generic, List, Optional, Type, TypeVar
+from typing import Generic, List, Optional, Tuple, Type, TypeVar
 
 from fastapi import HTTPException
 from pydantic import UUID4, BaseModel
@@ -37,7 +37,7 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
         query (Query): sqlalchemy query object with filters applied
     """
 
-    def __filter(self, query: Query, filters: FilterTypeDTO):
+    def __filter(self, query: Query, filters: FilterTypeDTO) -> Query:
         # keys to exclude (sorting and pagination)
         excluded_keys = ["offset", "limit", "sort_by", "sort_dir"]
         for name in filters:
@@ -67,24 +67,63 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
                     query = query.filter(getattr(self.model, name) == filters[name])
         return query
 
-    def get(self, id: UUID4) -> Optional[ModelType]:
-        result: Optional[ModelType] = (
+    """
+    Function to get a single item by UUID. Raises a 404 HTTP exception
+    if item was not found.
+
+    Parameters:
+        id (UUID4): UUID of item
+
+    Returns:
+        item (ModelType): item with given UUID4
+    """
+
+    def get(self, id: UUID4) -> ModelType:
+        item: Optional[ModelType] = (
             self.session.query(self.model).filter_by(id=id).first()
         )
-        if result is None:
+        if item is None:
             raise HTTPException(status_code=404, detail=f"Item with id {id} not found")
-        return result
+        return item
 
-    def list(self, filters: FilterTypeDTO) -> List[ModelType]:
+    """
+    Function to list items based on applied filters. Returns a tuple containing the list
+    of items, limited by the page size and page, and the number of total items based on
+    applied filters.
+
+    Parameters:
+        filters (FilterTypeDTO): object with filters to apply.
+            These filters have a specific format, highlighted in the function
+            description for `__filter()`
+
+    Returns:
+        result (List[ModelType]), num_total_results (int): a tuple containing the
+            list of items and the number of total items
+    """
+
+    def list(self, filters: FilterTypeDTO) -> Tuple[List[ModelType], int]:
         query = self.session.query(self.model)
         query = self.__filter(query, filters)
         query = query.order_by(
             getattr(getattr(self.model, filters["sort_by"]), filters["sort_dir"])()
         )
+        num_total_results = query.count()
         query = query.limit(filters["limit"])
         query = query.offset(filters["offset"])
         result: List[ModelType] = query.all()
-        return result
+        return result, num_total_results
+
+    """
+    Function to add an instance of the item to the database. Takes in the
+    item, adds it to the database, and returns the item with its assigned UUID.
+    If the item cannot be created, a 422 HTTP exception is thrown.
+
+    Parameters:
+        item (ModelTypeDTO): object to be added to the database, in DTO format.
+
+    Returns:
+        item (ModelType): object that has been added to the database
+    """
 
     def create(self, item: ModelTypeDTO) -> ModelType:
         item: ModelType = self.model(**item.dict())
@@ -96,7 +135,17 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
             raise HTTPException(status_code=422, detail="Item could not be created.")
         return item
 
-    # we are not going to return the list of objects, as it could be quite large
+    """
+    Function to add multiple items to the database. Takes in a list of
+    items and adds them to the database. Does not return the items, as the list could be
+    large.
+
+    If an issue is encountered while adding items, a 422 HTTP exception is thrown.
+
+    Parameters:
+        items (List[ModelTypeDTO]): objects to be added to the database, in DTO format.
+    """
+
     def bulk_create(self, items: List[ModelTypeDTO]) -> None:
         items: List[ModelType] = [self.model(**item.dict()) for item in items]
         self.session.add_all(items)
@@ -106,7 +155,20 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
             self.session.rollback()
             raise HTTPException(status_code=422, detail="Items could not be created.")
 
-    def update(self, id: UUID4, item: ModelTypeDTO) -> ModelTypeDTO:
+    """
+    Function to update the values for an item. Takes in the UUID of the item as well
+    as the full item object in DTO format, containing new values. Returns the edited item.
+    Raises a 404 HTTP exception if an item with the given UUID does not exist.
+
+    Parameters:
+        id (UUID4): the UUID of the item
+        item (ModelTypeDTO): new object to overwrite in the database
+
+    Returns:
+        db_item (ModelType): the edited item
+    """
+
+    def update(self, id: UUID4, item: ModelTypeDTO) -> ModelType:
         db_item = self.get(id)
         if db_item is None:
             raise HTTPException(status_code=404, detail=f"Item with id {id} not found")
@@ -116,6 +178,14 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
                 setattr(db_item, key, value)
         self.session.commit()
         return db_item
+
+    """
+    Function to delete an item by UUID. Takes in the UUID of the item and removes it from
+    the database.
+
+    Parameters:
+        id (UUID4): the UUID of the item
+    """
 
     def delete(self, id: UUID4) -> None:
         item = self.session.query(self.model).filter_by(id=id).first()

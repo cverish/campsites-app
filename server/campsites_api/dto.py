@@ -8,6 +8,7 @@ from pydantic.types import UUID4
 from campsites_db.models import (
     BearingEnum,
     CampsiteCountryEnum,
+    CampsiteStateEnum,
     CampsiteTypeEnum,
     ToiletTypeEnum,
 )
@@ -17,7 +18,7 @@ class CampsiteDTO(BaseModel):
     id: Optional[UUID4]
     code: Optional[str]
     name: str
-    state: str
+    state: CampsiteStateEnum
     country: CampsiteCountryEnum
     campsite_type: Optional[CampsiteTypeEnum]
     lon: float
@@ -50,6 +51,11 @@ class CampsiteDTO(BaseModel):
         orm_mode = True
 
 
+class CampsiteListDTO(BaseModel):
+    items: List[CampsiteDTO]
+    num_total_results: int
+
+
 class SortByEnum(str, Enum):
     code = "code"
     name = "name"
@@ -70,7 +76,7 @@ class CampsiteFilterDTO(BaseModel):
     sort_dir: Optional[SortDirEnum] = "asc"
     code__ct: Optional[str]
     name__ct: Optional[str]
-    state: Optional[List[str]]
+    state: Optional[List[CampsiteStateEnum]]
     country: Optional[CampsiteCountryEnum]
     campsite_type: Optional[List[CampsiteTypeEnum]]
     month_open__lt: Optional[int]
@@ -95,7 +101,7 @@ class CampsiteFilterDTO(BaseModel):
     low_no_fee: Optional[bool]
 
     # arguments are the query parameters used by FastAPI. Parsing it this way means
-    # we don't need to list each query parameter in the router function.
+    # we don't need to list each query parameter in the router function
     @classmethod
     def parser(
         cls,
@@ -105,7 +111,7 @@ class CampsiteFilterDTO(BaseModel):
         sort_dir: Optional[SortDirEnum] = Query("asc"),
         code__ct: Optional[str] = Query(None),
         name__ct: Optional[str] = Query(None),
-        state: Optional[List[str]] = Query(None),
+        state: Optional[List[CampsiteStateEnum]] = Query(None),
         country: Optional[CampsiteCountryEnum] = Query(None),
         campsite_type: Optional[List[CampsiteTypeEnum]] = Query(None),
         month_open__lt: Optional[int] = Query(None),

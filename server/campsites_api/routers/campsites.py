@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from pydantic import UUID4
 
-from campsites_api.dto import CampsiteDTO, CampsiteFilterDTO
+from campsites_api.dto import CampsiteDTO, CampsiteFilterDTO, CampsiteListDTO
 from campsites_api.services.campsites_service import (
     CampsitesService,
     get_campsites_service,
@@ -13,12 +13,13 @@ from campsites_api.utils.process_data import process_data
 router = APIRouter(prefix="/campsites")
 
 
-@router.get("", response_model=List[CampsiteDTO])
+@router.get("", response_model=CampsiteListDTO)
 async def list_campsites(
     filters: CampsiteFilterDTO = Depends(CampsiteFilterDTO.parser),
     campsites_service: CampsitesService = Depends(get_campsites_service),
 ):
-    return campsites_service.list(filters)
+    campsites, count = campsites_service.list(filters)
+    return CampsiteListDTO(items=campsites, num_total_results=count)
 
 
 @router.post("/upload")

@@ -8,6 +8,73 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
+class CampsiteStateEnum(str, Enum):
+    AK = "AK"
+    AL = "AL"
+    AR = "AR"
+    AZ = "AZ"
+    CA = "CA"
+    CO = "CO"
+    CT = "CT"
+    DC = "DC"
+    DE = "DE"
+    FL = "FL"
+    GA = "GA"
+    HI = "HI"
+    IA = "IA"
+    ID = "ID"
+    IL = "IL"
+    IN = "IN"
+    KS = "KS"
+    KY = "KY"
+    LA = "LA"
+    MA = "MA"
+    MD = "MD"
+    ME = "ME"
+    MI = "MI"
+    MN = "MN"
+    MO = "MO"
+    MS = "MS"
+    MT = "MT"
+    NC = "NC"
+    ND = "ND"
+    NE = "NE"
+    NH = "NH"
+    NJ = "NJ"
+    NM = "NM"
+    NV = "NV"
+    NY = "NY"
+    OH = "OH"
+    OK = "OK"
+    OR = "OR"
+    PA = "PA"
+    RI = "RI"
+    SC = "SC"
+    SD = "SD"
+    TN = "TN"
+    TX = "TX"
+    UT = "UT"
+    VA = "VA"
+    VT = "VT"
+    WA = "WA"
+    WI = "WI"
+    WV = "WV"
+    WY = "WY"
+    AB = "AB"
+    BC = "BC"
+    MB = "MB"
+    NB = "NB"
+    NL = "NL"
+    NT = "NT"
+    NS = "NS"
+    NU = "NU"
+    ON = "ON"
+    PE = "PE"
+    QC = "QC"
+    SK = "SK"
+    YT = "YT"
+
+
 class CampsiteCountryEnum(str, Enum):
     CAN = "CAN"
     USA = "USA"
@@ -69,7 +136,7 @@ class Campsite(Base):
     id = sa.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     code = sa.Column(sa.String, nullable=True)
     name = sa.Column(sa.String, nullable=False)
-    state = sa.Column(sa.String, nullable=False)
+    state = sa.Column(sa.Enum(CampsiteStateEnum), nullable=False)
     country = sa.Column(sa.Enum(CampsiteCountryEnum), nullable=False)
     campsite_type = sa.Column(sa.Enum(CampsiteTypeEnum), nullable=True)
     lon = sa.Column(sa.DOUBLE_PRECISION, nullable=False)
