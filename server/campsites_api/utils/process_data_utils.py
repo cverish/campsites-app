@@ -153,10 +153,8 @@ def process_amenities(amenity_str: Union[str, None]) -> dict:
             amenity_dict["has_electric_hookup"] = True if "E" in amenity_code else False
             amenity_dict["has_water_hookup"] = True if "W" in amenity_code else False
             amenity_dict["has_sewer_hookup"] = True if "S" in amenity_code else False
-            # educated guess: if campsite has a water hookup, it also has drinking water
-            # even if drinking water is not expressly specified
-            if "W" in amenity_code:
-                amenity_dict["has_drinking_water"] = True
+            if amenity_code != "NH":
+                amenity_dict["has_rv_hookup"] = True
 
         # sanitary dump
         if amenity_code in ["DP", "NP"]:

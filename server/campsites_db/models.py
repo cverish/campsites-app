@@ -152,6 +152,7 @@ class Campsite(Base):
     nearest_town_distance = sa.Column(sa.Float, nullable=True)
     nearest_town_bearing = sa.Column(sa.Enum(BearingEnum), nullable=True)
     # amenities
+    has_rv_hookup = sa.Column(sa.Boolean, nullable=True)
     has_water_hookup = sa.Column(sa.Boolean, nullable=True)
     has_electric_hookup = sa.Column(sa.Boolean, nullable=True)
     has_sewer_hookup = sa.Column(sa.Boolean, nullable=True)

@@ -34,6 +34,7 @@ class CampsiteDTO(BaseModel):
     nearest_town_distance: Optional[float]
     nearest_town_bearing: Optional[BearingEnum]
     # amenities
+    has_rv_hookup: Optional[bool]
     has_water_hookup: Optional[bool]
     has_electric_hookup: Optional[bool]
     has_sewer_hookup: Optional[bool]
@@ -87,6 +88,7 @@ class CampsiteFilterDTO(BaseModel):
     num_campsites__lt: Optional[int]
     nearest_town_distance__lt: Optional[float]
     # amenities
+    has_rv_hookup: Optional[bool]
     has_water_hookup: Optional[bool]
     has_electric_hookup: Optional[bool]
     has_sewer_hookup: Optional[bool]
@@ -121,6 +123,7 @@ class CampsiteFilterDTO(BaseModel):
         num_campsites__gt: Optional[int] = Query(None),
         num_campsites__lt: Optional[int] = Query(None),
         nearest_town_distance__lt: Optional[float] = Query(None),
+        has_rv_hookup: Optional[bool] = Query(None),
         has_water_hookup: Optional[bool] = Query(None),
         has_electric_hookup: Optional[bool] = Query(None),
         has_sewer_hookup: Optional[bool] = Query(None),

@@ -152,6 +152,7 @@ def upgrade() -> None:
         sa.Column("nearest_town", sa.String(), nullable=True),
         sa.Column("nearest_town_distance", sa.Float(), nullable=True),
         sa.Column("nearest_town_bearing", bearing_enum, nullable=True),
+        sa.Column("has_rv_hookup", sa.Boolean(), nullable=True),
         sa.Column("has_water_hookup", sa.Boolean(), nullable=True),
         sa.Column("has_electric_hookup", sa.Boolean(), nullable=True),
         sa.Column("has_sewer_hookup", sa.Boolean(), nullable=True),
