@@ -83,6 +83,7 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
             self.session.query(self.model).filter_by(id=id).first()
         )
         if item is None:
+            self.session.rollback()
             raise HTTPException(status_code=404, detail=f"Item with id {id} not found")
         return item
 
@@ -102,15 +103,18 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
     """
 
     def list(self, filters: FilterTypeDTO) -> Tuple[List[ModelType], int]:
-        query = self.session.query(self.model)
-        query = self.__filter(query, filters)
-        query = query.order_by(
-            getattr(getattr(self.model, filters["sort_by"]), filters["sort_dir"])()
-        )
-        num_total_results = query.count()
-        query = query.limit(filters["limit"])
-        query = query.offset(filters["offset"])
-        result: List[ModelType] = query.all()
+        try:
+            query = self.session.query(self.model)
+            query = self.__filter(query, filters)
+            query = query.order_by(
+                getattr(getattr(self.model, filters["sort_by"]), filters["sort_dir"])()
+            )
+            num_total_results = query.count()
+            query = query.limit(filters["limit"])
+            query = query.offset(filters["offset"])
+            result: List[ModelType] = query.all()
+        except Exception:
+            self.session.rollback()
         return result, num_total_results
 
     """
@@ -176,7 +180,10 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
             # we want to ensure we are not overwriting the ID
             if key != "id":
                 setattr(db_item, key, value)
-        self.session.commit()
+        try:
+            self.session.commit()
+        except Exception:
+            self.session.rollback()
         return db_item
 
     """
@@ -191,5 +198,8 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
         item = self.session.query(self.model).filter_by(id=id).first()
         if item is None:
             raise HTTPException(status_code=404, detail=f"Item with id {id} not found")
-        self.session.delete(item)
-        self.session.commit()
+        try:
+            self.session.delete(item)
+            self.session.commit()
+        except Exception:
+            self.session.rollback()
