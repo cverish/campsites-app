@@ -93,7 +93,7 @@ class CampsiteFilterDTO(BaseModel):
     has_electric_hookup: Optional[bool]
     has_sewer_hookup: Optional[bool]
     has_sanitary_dump: Optional[bool]
-    max_rv_length: Optional[int]
+    max_rv_length__gt: Optional[int]
     has_toilets: Optional[bool]
     toilet_type: Optional[List[ToiletTypeEnum]]
     has_drinking_water: Optional[bool]
@@ -128,7 +128,7 @@ class CampsiteFilterDTO(BaseModel):
         has_electric_hookup: Optional[bool] = Query(None),
         has_sewer_hookup: Optional[bool] = Query(None),
         has_sanitary_dump: Optional[bool] = Query(None),
-        max_rv_length: Optional[int] = Query(None),
+        max_rv_length__gt: Optional[int] = Query(None),
         has_toilets: Optional[bool] = Query(None),
         toilet_type: Optional[List[ToiletTypeEnum]] = Query(None),
         has_drinking_water: Optional[bool] = Query(None),
