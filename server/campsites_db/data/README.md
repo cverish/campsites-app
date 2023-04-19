@@ -43,7 +43,7 @@ Indicates the type of campsite. All campsites are public.
 | `NS`   | National Seashore                |
 | `NWR`  | National Wildlife Refuge         |
 | `PP`   | Canadian Provincial Park         |
-| `PR`   | Provinical Reserve               |
+| `PR`   | Canadian Provinical Reserve      |
 | `RES`  | Native American Reservation      |
 | `SB`   | State Beach                      |
 | `SCA`  | State Conservation Area          |
@@ -53,8 +53,8 @@ Indicates the type of campsite. All campsites are public.
 | `SPR`  | State Preserve                   |
 | `SR`   | State Reservation                |
 | `SRA`  | State Rec. Area                  |
-| `SRVA` | State Vehicle Recreation Area    |
-| `TVA`  | Tennessee Valley Auth.           |
+| `SRVA` | State Recreational Vehicle Area  |
+| `TVA`  | Tennessee Valley Authority       |
 | `USFW` | US Fish and Wildlife             | 
 | `UTIL` | Utility                          |
 | `null` | Unknown Type                     |
