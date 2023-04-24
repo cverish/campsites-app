@@ -21,19 +21,22 @@ const Campsites = (): JSX.Element => {
 
   const itemsPerPage = 20;
 
-  // set filter state and page based on search params
+  // set filter state and page based on search params on load
+  // page is set to 0 on load to indicate this should run.
   useEffect(() => {
-    const params = QueryString.parse(searchParams.toString());
-    setPage(Number(params.page) || 1);
-    try {
-      setFilterState({
-        ...defaultFilterState,
-        ...JSON.parse(params.filters as string),
-      });
-    } catch {
-      setFilterState({ ...defaultFilterState });
+    if (page === 0) {
+      const params = QueryString.parse(searchParams.toString());
+      try {
+        setFilterState({
+          ...defaultFilterState,
+          ...JSON.parse(params.filters as string),
+        });
+      } catch {
+        setFilterState({ ...defaultFilterState });
+      }
+      setPage(Number(params.page) || 1);
     }
-  }, [searchParams]);
+  }, [searchParams, page]);
 
   // update search params when filter state or page number changes
   useEffect(() => {
@@ -69,8 +72,8 @@ const Campsites = (): JSX.Element => {
       enabled: page > 0,
       retry: 1,
     }
-  );
-
+    );
+  
   // determine the number of pages to render in pagination based on results
   useEffect(() => {
     if (campsites) {
@@ -79,6 +82,7 @@ const Campsites = (): JSX.Element => {
   }, [campsites]);
 
   // function to toggle the sort direction between asc and desc
+  // reset page to 1 when sort direction changes
   const toggleSortDir = () => {
     const newSortDir =
       filterState.sort_dir === SortDirEnum.ASC
@@ -88,12 +92,18 @@ const Campsites = (): JSX.Element => {
     setPage(1);
   };
 
+  // function to change the sort by value
+  // reset page to 1 when sort by changes
   const setSortBy = (newSortBy: SortByEnum) => {
     setFilterState({ ...filterState, sort_by: newSortBy });
+    setPage(1);
   };
 
-  if (isError) {
-    // throw new Response("Error", { status: 404 });
+  // function to handle filter state change
+  // reset page to 1 when filters change
+  const handleFilterStateChange = (newFilterState: CampsiteFilters) => {
+    setFilterState({ ...newFilterState });
+    setPage(1);
   }
 
   return (
@@ -125,7 +135,7 @@ const Campsites = (): JSX.Element => {
               campsites={campsites?.items}
               numResults={campsites?.num_total_results}
               filterState={filterState}
-              setFilterState={setFilterState}
+              handleFilterStateChange={handleFilterStateChange}
               pageProps={{
                 totalPages,
                 page,

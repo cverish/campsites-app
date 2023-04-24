@@ -6,7 +6,7 @@ import { defaultFilterState } from "constants/defaultFilterState";
 
 type FilterDrawerProps = {
   filterState: CampsiteFilters;
-  setFilterState: (val: CampsiteFilters) => void;
+  handleFilterStateChange: (val: CampsiteFilters) => void;
   numResults: number | undefined;
   open: boolean;
   setClosed: () => void;
@@ -17,11 +17,11 @@ const FilterDrawer = (props: FilterDrawerProps): JSX.Element => {
     JSON.stringify(props.filterState) === JSON.stringify(defaultFilterState);
 
   const handleClearFiltersClick = () => {
-    props.setFilterState({ ...defaultFilterState });
+    props.handleFilterStateChange({ ...defaultFilterState });
   };
 
   return (
-    <Drawer.Root opened={props.open} onClose={props.setClosed} position="right">
+    <Drawer.Root opened={props.open} onClose={props.setClosed} position="right" keepMounted>
       <Drawer.Overlay />
       <Drawer.Content maw="calc(100vw - 10%)">
         <Drawer.Header sx={{ zIndex: 2000 }}>
@@ -33,7 +33,7 @@ const FilterDrawer = (props: FilterDrawerProps): JSX.Element => {
         <Drawer.Body sx={{ paddingBottom: 0 }}>
           <Filters
             filterState={props.filterState}
-            setFilterState={props.setFilterState}
+            handleFilterStateChange={props.handleFilterStateChange}
           />
           <div
             style={{

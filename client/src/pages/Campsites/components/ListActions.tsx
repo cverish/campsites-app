@@ -25,7 +25,7 @@ type SortProps = {
 type ListActionProps = {
   isFetching: boolean;
   filterState: CampsiteFilters;
-  setFilterState: (filters: CampsiteFilters) => void;
+  handleFilterStateChange: (filters: CampsiteFilters) => void;
   sortProps: SortProps;
   numResults: number | undefined;
 };
@@ -46,7 +46,7 @@ const ListActions = (props: ListActionProps): JSX.Element => {
   ).filter((key) => !["sort_by", "sort_dir"].includes(key)).length;
 
   const onResetFiltersClick = () => {
-    props.setFilterState({ ...defaultFilterState });
+    props.handleFilterStateChange({ ...defaultFilterState });
   };
 
   return (
@@ -74,7 +74,7 @@ const ListActions = (props: ListActionProps): JSX.Element => {
       </Tooltip>
       <FilterDrawer
         filterState={props.filterState}
-        setFilterState={props.setFilterState}
+        handleFilterStateChange={props.handleFilterStateChange}
         numResults={props.numResults}
         open={filtersOpen}
         setClosed={() => setFiltersOpen(false)}

@@ -35,11 +35,11 @@ const FT = (props: { label: string }) => {
 
 type FiltersProps = {
   filterState: CampsiteFilters;
-  setFilterState: (filters: CampsiteFilters) => void;
+  handleFilterStateChange: (filters: CampsiteFilters) => void;
 };
 
 const Filters = (props: FiltersProps): JSX.Element => {
-  const { filterState, setFilterState } = props;
+  const { filterState, handleFilterStateChange } = props;
 
   // clear out states in the filterState that don't correspond
   // to currently-selected country
@@ -50,7 +50,7 @@ const Filters = (props: FiltersProps): JSX.Element => {
           !filterState.country ||
           countryStateMap[filterState.country].includes(s)
       );
-      setFilterState({
+      handleFilterStateChange({
         ...filterState,
         state: newStates.length ? newStates : null,
       });
@@ -87,7 +87,7 @@ const Filters = (props: FiltersProps): JSX.Element => {
     filterKey: keyof CampsiteFilters,
     value: string | number | null
   ) => {
-    setFilterState({
+    handleFilterStateChange({
       ...filterState,
       [filterKey]: value,
     });
@@ -100,8 +100,7 @@ const Filters = (props: FiltersProps): JSX.Element => {
       filterState[filterKey] as boolean | null
     );
     const newValIndex = (currentValueIndex + 1) % 3;
-
-    setFilterState({
+    handleFilterStateChange({
       ...filterState,
       [filterKey]: valueOptions[newValIndex],
     });
@@ -112,7 +111,7 @@ const Filters = (props: FiltersProps): JSX.Element => {
     value: string[]
   ) => {
     const newValue = value.length ? value : null;
-    setFilterState({
+    handleFilterStateChange({
       ...filterState,
       [filterKey]: newValue,
     });
@@ -122,7 +121,7 @@ const Filters = (props: FiltersProps): JSX.Element => {
     openValue: number | null,
     closeValue: number | null
   ) => {
-    setFilterState({
+    handleFilterStateChange({
       ...filterState,
       month_open__lt: openValue,
       month_close__gt: closeValue,

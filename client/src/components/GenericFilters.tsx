@@ -97,16 +97,31 @@ export const TextFilter = <T extends unknown>(props: {
   const [debounced] = useDebouncedValue(input, 250);
 
   useEffect(() => {
-    if (debounced === input) {
+    if (debounced === input && input !== props.value) {
       props.onChange(props.filterKey, debounced);
     }
-  }, [debounced, input]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [debounced, input, props]);
+
+  const handleClear = (() => {
+    setInput(null);
+    props.onChange(props.filterKey, null);
+  })
 
   return (
     <TextInput
       value={input ?? ""}
       onChange={(e) => setInput(e.target.value)}
       placeholder={props.placeholderText}
+      rightSection={
+        props.value && (
+          <ActionIcon
+            mr={10}
+            onClick={handleClear}
+          >
+            <Icon icon="iconoir:cancel" />
+          </ActionIcon>
+        )
+      }
     />
   );
 };
@@ -121,15 +136,20 @@ export const NumberFilter = <T extends unknown>(props: {
   const [debounced] = useDebouncedValue(input, 250);
 
   useEffect(() => {
-    if (debounced === input) {
+    if (debounced === input && input !== props.value) {
       props.onChange(props.filterKey, debounced);
     }
-  }, [debounced, input]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [debounced, input, props]);
+
+  const handleClear = (() => {
+    setInput(null);
+    props.onChange(props.filterKey, null);
+  })
 
   return (
     <NumberInput
       type="number"
-      value={props.value || ""}
+      value={input ?? ""}
       min={0}
       placeholder={props.placeholderText}
       hideControls
@@ -138,7 +158,7 @@ export const NumberFilter = <T extends unknown>(props: {
         props.value && (
           <ActionIcon
             mr={10}
-            onClick={() => props.onChange(props.filterKey, null)}
+            onClick={handleClear}
           >
             <Icon icon="iconoir:cancel" />
           </ActionIcon>

@@ -23,7 +23,7 @@ type CampsitesListProps = {
   campsites: Campsite[] | undefined;
   numResults: number | undefined;
   filterState: CampsiteFilters;
-  setFilterState: (filters: CampsiteFilters) => void;
+  handleFilterStateChange: (filters: CampsiteFilters) => void;
   pageProps: PageProps;
   sortProps: SortProps;
 };
@@ -48,7 +48,7 @@ const CampsitesList = (props: CampsitesListProps): JSX.Element => {
             numResults={props.numResults}
             sortProps={props.sortProps}
             filterState={props.filterState}
-            setFilterState={props.setFilterState}
+            handleFilterStateChange={props.handleFilterStateChange}
           />
         }
       />
