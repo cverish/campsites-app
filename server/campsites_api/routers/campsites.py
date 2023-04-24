@@ -13,7 +13,7 @@ from campsites_api.utils.process_data import process_data
 router = APIRouter(prefix="/campsites")
 
 
-@router.get("", response_model=CampsiteListDTO)
+@router.get("", response_model=CampsiteListDTO, tags=["GET"])
 async def list_campsites(
     filters: CampsiteFilterDTO = Depends(CampsiteFilterDTO.parser),
     campsites_service: CampsitesService = Depends(get_campsites_service),
@@ -22,7 +22,7 @@ async def list_campsites(
     return CampsiteListDTO(items=campsites, num_total_results=count)
 
 
-@router.post("/upload")
+@router.post("/upload", tags=["POST"])
 async def upload_campsites(
     csv_file: UploadFile,
     campsites_service: CampsitesService = Depends(get_campsites_service),
@@ -31,7 +31,7 @@ async def upload_campsites(
     campsites_service.bulk_create(campsites)
 
 
-@router.post("/campsite", response_model=CampsiteDTO)
+@router.post("/campsite", response_model=CampsiteDTO, tags=["POST"])
 async def create_campsite(
     campsite: CampsiteDTO,
     campsites_service: CampsitesService = Depends(get_campsites_service),
@@ -39,7 +39,7 @@ async def create_campsite(
     return campsites_service.create(campsite)
 
 
-@router.get("/campsite/{campsite_uuid4}", response_model=CampsiteDTO)
+@router.get("/campsite/{campsite_uuid4}", response_model=CampsiteDTO, tags=["GET"])
 async def get_campsite(
     campsite_uuid4: UUID4,
     campsites_service: CampsitesService = Depends(get_campsites_service),
@@ -51,7 +51,7 @@ async def get_campsite(
         raise HTTPException(status_code=404, detail="Not found")
 
 
-@router.patch("/campsite/{campsite_uuid4}", response_model=CampsiteDTO)
+@router.patch("/campsite/{campsite_uuid4}", response_model=CampsiteDTO, tags=["PATCH"])
 async def update_campsite(
     campsite_uuid4: UUID4,
     campsite: CampsiteDTO,
@@ -60,7 +60,7 @@ async def update_campsite(
     return campsites_service.update(campsite_uuid4, campsite)
 
 
-@router.delete("/campsite/{campsite_uuid4}")
+@router.delete("/campsite/{campsite_uuid4}", tags=["DELETE"])
 async def delete_campsite(
     campsite_uuid4: UUID4,
     campsites_service: CampsitesService = Depends(get_campsites_service),

@@ -19,6 +19,7 @@ type PageProps = {
 
 type CampsitesListProps = {
   isFetching: boolean;
+  isError: boolean;
   campsites: Campsite[] | undefined;
   numResults: number | undefined;
   filterState: CampsiteFilters;
@@ -52,7 +53,7 @@ const CampsitesList = (props: CampsitesListProps): JSX.Element => {
         }
       />
       <Grid>
-        {props.isFetching ? (
+        {props.isFetching || props.isError ? (
           [...Array(4)].map((e, i) => (
             <Grid.Col sm={6} key={i}>
               <Skeleton height={225} mt="sm" radius="md" />

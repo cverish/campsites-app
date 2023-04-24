@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Container, Tabs } from "@mantine/core";
+import { Alert, Anchor, Container, Dialog, Tabs } from "@mantine/core";
 import { Icon } from "@iconify/react";
 import { CampsitesList } from "./components";
 import { getCampsites } from "http/campsites";
@@ -93,7 +93,7 @@ const Campsites = (): JSX.Element => {
   };
 
   if (isError) {
-    throw new Response("Error", { status: 404 });
+    // throw new Response("Error", { status: 404 });
   }
 
   return (
@@ -121,6 +121,7 @@ const Campsites = (): JSX.Element => {
           <Tabs.Panel value="list" pt="xs">
             <CampsitesList
               isFetching={isFetching}
+              isError={isError}
               campsites={campsites?.items}
               numResults={campsites?.num_total_results}
               filterState={filterState}
@@ -143,6 +144,21 @@ const Campsites = (): JSX.Element => {
           </Tabs.Panel>
         </>
       </Tabs>
+      <Dialog opened={isError} p={0}>
+        <Alert
+          icon={
+            <Icon
+              icon="material-symbols:error-rounded"
+            />
+          }
+          title="Problem loading campsites"
+          color="red"
+          variant="outline"
+        >
+          Something went wrong and the campsites could not be loaded. Try{" "}
+          <Anchor href="/">refreshing the page.</Anchor>
+        </Alert>
+      </Dialog>
     </Container>
   );
 };

@@ -3,12 +3,36 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from campsites_api.routers import campsites
 
+tags_metadata = [
+    {
+        "name": "health",
+        "description": "Health check"
+    },
+    {
+        "name": "GET",
+        "description": "Open to all users.",
+    },
+    {
+        "name": "POST",
+        "description": "Restricted.",
+    },
+    {
+        "name": "PATCH",
+        "description": "Restricted.",
+    },
+    {
+        "name": "DELETE",
+        "description": "Restricted.",
+    },
+]
+
 
 def create_app() -> FastAPI:
     app = FastAPI(
         title="campsites",
         description="API for campsites in the US and Canada",
         version="1.0",
+        openapi_tags=tags_metadata
     )
 
     origins = [
@@ -23,7 +47,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    @app.get("/health")
+    @app.get("/health", tags=["health"])
     async def health() -> str:
         return "ok"
 
