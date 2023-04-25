@@ -155,6 +155,8 @@ def process_amenities(amenity_str: Union[str, None]) -> dict:
             amenity_dict["has_sewer_hookup"] = True if "S" in amenity_code else False
             if amenity_code != "NH":
                 amenity_dict["has_rv_hookup"] = True
+            elif amenity_code == "NH":
+                amenity_dict["has_rv_hookup"] = False
 
         # sanitary dump
         if amenity_code in ["DP", "NP"]:

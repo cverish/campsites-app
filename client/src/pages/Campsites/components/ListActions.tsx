@@ -8,6 +8,7 @@ import {
   Tooltip,
   Text,
   Indicator,
+  Grid,
 } from "@mantine/core";
 import { CampsiteFilters, SortByEnum, SortDirEnum } from "models";
 import { Icon } from "@iconify/react";
@@ -39,8 +40,10 @@ type ListActionProps = {
   numResults: number | undefined;
 };
 
-const SortByDropdown = (props: { sortProps: SortProps }): JSX.Element => {
-  const { sortBy, setSortBy } = props.sortProps;
+const SortDropdown = (props: { sortProps: SortProps }): JSX.Element => {
+  const { sortBy, setSortBy, sortDir, toggleSortDir } = props.sortProps;
+
+  const directionIcon = `tabler:sort-${sortDir}ending-letters`;
 
   const sortByOptions = Object.keys(SortByEnum).map((option) => ({
     value: option.toLowerCase(),
@@ -50,32 +53,44 @@ const SortByDropdown = (props: { sortProps: SortProps }): JSX.Element => {
   return (
     <Popover position="bottom-end" shadow="sm">
       <Popover.Target>
-        <Tooltip label={`Sort by: ${sortBy.replace("_", " ").toLowerCase()}`}>
+        <Tooltip
+          label={`Sort by: ${sortBy
+            .replace("_", " ")
+            .toLowerCase()} (${sortDir})`}
+        >
           <ActionIcon color="blue" size="md">
             <Icon icon="material-symbols:sort-rounded" width={24} height={24} />
           </ActionIcon>
         </Tooltip>
       </Popover.Target>
       <Popover.Dropdown>
-        <div style={{ padding: "6px 6px 12px 6px" }}>
-          <Select
-            label="Sort by"
-            w={200}
-            value={sortBy}
-            data={sortByOptions}
-            onChange={setSortBy}
-          />
-        </div>
+        <Text size="14px" pb={6}>
+          Sort Settings
+        </Text>
+        <Grid align="flex-end" gutter="xs">
+          <Grid.Col span="auto">
+            <Select
+              w={200}
+              value={sortBy}
+              data={sortByOptions}
+              onChange={setSortBy}
+            />
+          </Grid.Col>
+          <Grid.Col span="content" pb={8}>
+            <Tooltip label={`Sort direction: ${sortDir}ending`}>
+              <ActionIcon onClick={toggleSortDir} color="blue" size="md">
+                <Icon icon={directionIcon} width={36} height={36} />
+              </ActionIcon>
+            </Tooltip>
+          </Grid.Col>
+        </Grid>
       </Popover.Dropdown>
     </Popover>
   );
 };
 
 const ListActions = (props: ListActionProps): JSX.Element => {
-  const { sortDir, toggleSortDir } = props.sortProps;
   const [filtersOpen, setFiltersOpen] = useState(false);
-
-  const directionIcon = `tabler:sort-${sortDir}ending-letters`;
 
   // calculating the start result number to build display string
   // e.g. 1-20 of 1000
@@ -131,12 +146,7 @@ const ListActions = (props: ListActionProps): JSX.Element => {
           </Tooltip>
         </ActionIcon>
         <Divider orientation="vertical" />
-        <SortByDropdown sortProps={props.sortProps} />
-        <Tooltip label={`Sort direction: ${sortDir}ending`}>
-          <ActionIcon onClick={toggleSortDir} color="blue" size="md">
-            <Icon icon={directionIcon} width={24} height={24} />
-          </ActionIcon>
-        </Tooltip>
+        <SortDropdown sortProps={props.sortProps} />
       </Group>
       <FilterDrawer
         filterState={props.filterState}
