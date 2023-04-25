@@ -3,9 +3,9 @@
 ## Background
 A full-stack application for exploring public campsites across the US and Canada.
 
-The app currently contains a filterable list view of all campsites with server-side filtering, sorting, and pagination.
+The app currently contains a filterable list view of all campsites with server-side filtering, sorting, and pagination. It's also mobile-friendly! More features to come, go to the [Project Status](#project-status) section for more details.
 
-✨ ***work-in-progress*** ✨
+View the work-in-progress application [here](https://campsites.veri.sh).
 
 ## Table of Contents
 - [Background](#background)
