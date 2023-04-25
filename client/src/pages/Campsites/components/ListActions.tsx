@@ -26,6 +26,7 @@ type ListActionProps = {
   isFetching: boolean;
   filterState: CampsiteFilters;
   handleFilterStateChange: (filters: CampsiteFilters) => void;
+  handleClearFilters: () => void;
   sortProps: SortProps;
   numResults: number | undefined;
 };
@@ -53,7 +54,9 @@ const ListActions = (props: ListActionProps): JSX.Element => {
     <Group spacing={5}>
       <Divider orientation="vertical" />
       <Text c="dimmed" fz="sm" px={5}>
-        {props.isFetching ? "Loading..." : `${props.numResults} Results`}
+        {props.isFetching || props.numResults === undefined
+          ? "Loading..."
+          : `${props.numResults} Results`}
       </Text>
       <Divider orientation="vertical" />
       <Tooltip
@@ -75,6 +78,7 @@ const ListActions = (props: ListActionProps): JSX.Element => {
       <FilterDrawer
         filterState={props.filterState}
         handleFilterStateChange={props.handleFilterStateChange}
+        handleClearFilters={props.handleClearFilters}
         numResults={props.numResults}
         open={filtersOpen}
         setClosed={() => setFiltersOpen(false)}

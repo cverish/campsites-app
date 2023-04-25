@@ -21,7 +21,7 @@ const Campsites = (): JSX.Element => {
 
   const itemsPerPage = 20;
 
-  // set filter state and page based on search params on load
+  // set filter state and page based on search params on load.
   // page is set to 0 on load to indicate this should run.
   useEffect(() => {
     if (page === 0) {
@@ -72,8 +72,8 @@ const Campsites = (): JSX.Element => {
       enabled: page > 0,
       retry: 1,
     }
-    );
-  
+  );
+
   // determine the number of pages to render in pagination based on results
   useEffect(() => {
     if (campsites) {
@@ -104,7 +104,12 @@ const Campsites = (): JSX.Element => {
   const handleFilterStateChange = (newFilterState: CampsiteFilters) => {
     setFilterState({ ...newFilterState });
     setPage(1);
-  }
+  };
+
+  const handleClearFilters = () => {
+    setFilterState({ ...defaultFilterState });
+    setPage(1);
+  };
 
   return (
     <Container>
@@ -136,6 +141,7 @@ const Campsites = (): JSX.Element => {
               numResults={campsites?.num_total_results}
               filterState={filterState}
               handleFilterStateChange={handleFilterStateChange}
+              handleClearFilters={handleClearFilters}
               pageProps={{
                 totalPages,
                 page,
@@ -156,11 +162,7 @@ const Campsites = (): JSX.Element => {
       </Tabs>
       <Dialog opened={isError} p={0}>
         <Alert
-          icon={
-            <Icon
-              icon="material-symbols:error-rounded"
-            />
-          }
+          icon={<Icon icon="material-symbols:error-rounded" />}
           title="Problem loading campsites"
           color="red"
           variant="outline"

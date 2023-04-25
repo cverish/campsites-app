@@ -8,6 +8,7 @@ import { useElementSize } from "@mantine/hooks";
 type FilterDrawerProps = {
   filterState: CampsiteFilters;
   handleFilterStateChange: (val: CampsiteFilters) => void;
+  handleClearFilters: () => void;
   numResults: number | undefined;
   open: boolean;
   setClosed: () => void;
@@ -29,10 +30,6 @@ const FilterDrawer = (props: FilterDrawerProps): JSX.Element => {
   const resetFiltersDisabled =
     JSON.stringify(props.filterState) === JSON.stringify(defaultFilterState);
 
-  const handleClearFiltersClick = () => {
-    props.handleFilterStateChange({ ...defaultFilterState });
-  };
-
   return (
     <Drawer.Root
       opened={props.open}
@@ -41,7 +38,7 @@ const FilterDrawer = (props: FilterDrawerProps): JSX.Element => {
       keepMounted
     >
       <Drawer.Overlay />
-      <Drawer.Content  ref={totalRef} maw="calc(100vw - 10%)">
+      <Drawer.Content ref={totalRef} maw="calc(100vw - 10%)">
         <Drawer.Header ref={headerRef} sx={{ zIndex: 2000 }}>
           <Drawer.Title sx={{ fontSize: 22, fontWeight: 600 }}>
             Filters
@@ -84,7 +81,7 @@ const FilterDrawer = (props: FilterDrawerProps): JSX.Element => {
           <Button
             variant="outline"
             disabled={resetFiltersDisabled}
-            onClick={handleClearFiltersClick}
+            onClick={props.handleClearFilters}
             w="100%"
           >
             Clear Filters

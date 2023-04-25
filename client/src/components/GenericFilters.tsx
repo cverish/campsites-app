@@ -96,16 +96,26 @@ export const TextFilter = <T extends unknown>(props: {
   const [input, setInput] = useState(props.value);
   const [debounced] = useDebouncedValue(input, 250);
 
+  // we need to disable the exhaustive deps eslint rule for debounces.
+  // including `props` in the list of dependencies  causes the useEffect
+  // to run again when props.value is set outside of this component
+  // (namely, when filters are reset via a button).
+  // The debounce causes the input to be refilled with the prior value
+  // upon filter reset, causing the filter value to not be reset.
   useEffect(() => {
     if (debounced === input && input !== props.value) {
       props.onChange(props.filterKey, debounced);
     }
-  }, [debounced, input, props]);
+  }, [debounced, input]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleClear = (() => {
+  useEffect(() => {
+    setInput(props.value);
+  }, [props.value]);
+
+  const handleClear = () => {
     setInput(null);
     props.onChange(props.filterKey, null);
-  })
+  };
 
   return (
     <TextInput
@@ -114,10 +124,7 @@ export const TextFilter = <T extends unknown>(props: {
       placeholder={props.placeholderText}
       rightSection={
         props.value && (
-          <ActionIcon
-            mr={10}
-            onClick={handleClear}
-          >
+          <ActionIcon mr={10} onClick={handleClear}>
             <Icon icon="iconoir:cancel" />
           </ActionIcon>
         )
@@ -135,16 +142,26 @@ export const NumberFilter = <T extends unknown>(props: {
   const [input, setInput] = useState(props.value);
   const [debounced] = useDebouncedValue(input, 250);
 
+  // we need to disable the exhaustive deps eslint rule for debounces.
+  // including `props` in the list of dependencies  causes the useEffect
+  // to run again when props.value is set outside of this component
+  // (namely, when filters are reset via a button).
+  // The debounce causes the input to be refilled with the prior value
+  // upon filter reset, causing the filter value to not be reset.
   useEffect(() => {
     if (debounced === input && input !== props.value) {
       props.onChange(props.filterKey, debounced);
     }
-  }, [debounced, input, props]);
+  }, [debounced, input]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleClear = (() => {
+  useEffect(() => {
+    setInput(props.value);
+  }, [props.value]);
+
+  const handleClear = () => {
     setInput(null);
     props.onChange(props.filterKey, null);
-  })
+  };
 
   return (
     <NumberInput
@@ -156,10 +173,7 @@ export const NumberFilter = <T extends unknown>(props: {
       onChange={(newVal) => setInput(newVal !== "" ? newVal : null)}
       rightSection={
         props.value && (
-          <ActionIcon
-            mr={10}
-            onClick={handleClear}
-          >
+          <ActionIcon mr={10} onClick={handleClear}>
             <Icon icon="iconoir:cancel" />
           </ActionIcon>
         )
