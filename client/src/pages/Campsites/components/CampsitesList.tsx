@@ -54,7 +54,7 @@ const CampsitesList = (props: CampsitesListProps): JSX.Element => {
   const [, scrollTo] = useWindowScroll();
 
   const showPagination =
-    !(props.isFetching || props.isError) && props.campsites && props.numResults;
+    !(props.isFetching || props.isError) && !!props.campsites && !!props.numResults;
 
   const handlePaginationChange = (newPage: number) => {
     setPage(newPage);
