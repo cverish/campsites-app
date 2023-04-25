@@ -146,6 +146,7 @@ const Campsites = (): JSX.Element => {
                 totalPages,
                 page,
                 setPage,
+                itemsPerPage,
               }}
               sortProps={{
                 sortDir: filterState.sort_dir,

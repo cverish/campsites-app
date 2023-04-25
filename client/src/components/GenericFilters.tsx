@@ -237,6 +237,8 @@ export const MonthRangeFilter = <T extends unknown>(props: {
     const isChecked = e.currentTarget.checked;
     if (isChecked) {
       props.onChange(1, 12);
+    } else {
+      props.onChange(null, null);
     }
     setChecked(isChecked);
   };

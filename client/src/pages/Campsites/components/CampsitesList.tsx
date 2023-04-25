@@ -35,6 +35,7 @@ type PageProps = {
   totalPages: number;
   page: number;
   setPage: (newPage: number) => void;
+  itemsPerPage: number;
 };
 
 type CampsitesListProps = {
@@ -54,7 +55,9 @@ const CampsitesList = (props: CampsitesListProps): JSX.Element => {
   const [, scrollTo] = useWindowScroll();
 
   const showPagination =
-    !(props.isFetching || props.isError) && !!props.campsites && !!props.numResults;
+    !(props.isFetching || props.isError) &&
+    !!props.campsites &&
+    !!props.numResults;
 
   const handlePaginationChange = (newPage: number) => {
     setPage(newPage);
@@ -71,6 +74,7 @@ const CampsitesList = (props: CampsitesListProps): JSX.Element => {
             isFetching={props.isFetching}
             numResults={props.numResults}
             sortProps={props.sortProps}
+            pageProps={props.pageProps}
             filterState={props.filterState}
             handleFilterStateChange={props.handleFilterStateChange}
             handleClearFilters={props.handleClearFilters}
