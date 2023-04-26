@@ -29,8 +29,12 @@ services:
       POSTGRES_DB: "postgres"
     volumes:
       - ./server/campsites_db/scripts:/docker-entrypoint-initdb.d/
+      - db_volume:/var/lib/postgresql/data
     networks:
       - campsites
+
+volumes:
+  db_volume:
 
 networks:
   campsites:

@@ -4,6 +4,7 @@ from enum import Enum
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
+from geoalchemy2 import Geometry
 
 Base = declarative_base()
 
@@ -141,6 +142,7 @@ class Campsite(Base):
     campsite_type = sa.Column(sa.Enum(CampsiteTypeEnum), nullable=True)
     lon = sa.Column(sa.DOUBLE_PRECISION, nullable=False)
     lat = sa.Column(sa.DOUBLE_PRECISION, nullable=False)
+    geo = sa.Column(Geometry("POINT", srid=4326), nullable=False)
     composite = sa.Column(sa.Text, nullable=False)
     comments = sa.Column(sa.Text, nullable=True)
     phone = sa.Column(sa.String, nullable=True)
