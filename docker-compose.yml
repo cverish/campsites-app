@@ -18,14 +18,17 @@ services:
       - campsites
   
   db:
-    image: postgres:13
+    build: ./server/campsites_db
     container_name: campsites_postgresql
+    restart: always
     ports:
       - "5555:5432"
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
       POSTGRES_DB: "postgres"
+    volumes:
+      - ./server/campsites_db/scripts:/docker-entrypoint-initdb.d/
     networks:
       - campsites
 
