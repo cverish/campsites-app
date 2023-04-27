@@ -5,12 +5,9 @@ Revises: 79e7e8b01bfb
 Create Date: 2023-04-26 03:45:33.656287
 
 """
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from geoalchemy2 import Geometry
-from geoalchemy2.shape import from_shape
-from shapely.geometry import Point
-
 
 # revision identifiers, used by Alembic.
 revision = "578280956c02"

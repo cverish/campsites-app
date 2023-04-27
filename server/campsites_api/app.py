@@ -4,10 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from campsites_api.routers import campsites
 
 tags_metadata = [
-    {
-        "name": "health",
-        "description": "Health check"
-    },
+    {"name": "health", "description": "Health check"},
     {
         "name": "GET",
         "description": "Open to all users.",
@@ -32,7 +29,7 @@ def create_app() -> FastAPI:
         title="campsites",
         description="API for campsites in the US and Canada",
         version="1.0",
-        openapi_tags=tags_metadata
+        openapi_tags=tags_metadata,
     )
 
     origins = [

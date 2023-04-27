@@ -2,9 +2,9 @@ import uuid
 from enum import Enum
 
 import sqlalchemy as sa
+from geoalchemy2 import Geometry
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
-from geoalchemy2 import Geometry
 
 Base = declarative_base()
 
