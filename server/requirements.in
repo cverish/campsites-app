@@ -5,3 +5,4 @@ sqlalchemy
 geoalchemy2
 psycopg2-binary
 shapely
+alembic

@@ -1,16 +1,16 @@
-from typing import Optional
 import uuid
 from enum import Enum
-from pydantic import UUID4
+from typing import Optional
 
-import sqlalchemy as sa
 from geoalchemy2 import Geometry
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
+from pydantic import UUID4
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
     pass
+
 
 class CampsiteStateEnum(str, Enum):
     AK = "AK"
@@ -134,10 +134,22 @@ class ToiletTypeEnum(str, Enum):
     pit = "pit"
 
 
+def build_geo_point(context):
+    """
+    Function fed to 'geo' column's 'default' to build the point
+    representation of the latitude and longitude
+    """
+    lon = context.get_current_parameters()["lon"]
+    lat = context.get_current_parameters()["lat"]
+    return f"POINT ({lon} {lat})"
+
+
 class Campsite(Base):
     __tablename__ = "campsites"
 
-    id: Mapped[UUID4] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[UUID4] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
     code: Mapped[Optional[str]]
     name: Mapped[str]
     state: Mapped[CampsiteStateEnum]
@@ -145,7 +157,9 @@ class Campsite(Base):
     campsite_type: Mapped[Optional[CampsiteTypeEnum]]
     lon: Mapped[float]
     lat: Mapped[float]
-    geo: Mapped[Geometry] = mapped_column(Geometry("POINT", srid=4326))
+    geo: Mapped[Geometry] = mapped_column(
+        Geometry("POINT", srid=4326), default=build_geo_point
+    )
     composite: Mapped[str]
     comments: Mapped[Optional[str]]
     phone: Mapped[Optional[str]]
