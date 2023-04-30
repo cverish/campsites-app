@@ -23,6 +23,7 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
 
     The name of the filters may contain a modifier at the end, preceded with two
     underscores. Allowed modifiers:
+        __eq: filter by NUMBER values equal to a given value
         __lt: filter by values less than or equal to a given value
         __gt: filter by values greater than or equal to a given value
         __ct: filter by string values containing given substring
@@ -55,7 +56,6 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
                         getattr(self.model, name[:-4]) >= filters[name]
                     )
                 elif name[-4:] == "__ct":
-                    # contains query
                     query = query.filter(
                         func.lower(getattr(self.model, name[:-4])).contains(
                             filters[name].lower()
@@ -64,7 +64,10 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
                 elif isinstance(filters[name], list):
                     query = query.filter(getattr(self.model, name).in_(filters[name]))
                 else:
-                    query = query.filter(getattr(self.model, name) == filters[name])
+                    filter_value = filters[name].lower()
+                    query = query.filter(
+                        func.lower(getattr(self.model, name)) == filter_value
+                    )
         return query
 
     """
@@ -104,8 +107,11 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
 
     def list(self, filters: FilterTypeDTO) -> Tuple[List[ModelType], int]:
         try:
+            print("?")
             query = self.session.query(self.model)
+            print("??")
             query = self.__filter(query, filters)
+            print("???")
             query = query.order_by(
                 getattr(getattr(self.model, filters["sort_by"]), filters["sort_dir"])()
             )
@@ -113,9 +119,9 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
             query = query.limit(filters["limit"])
             query = query.offset(filters["offset"])
             result: List[ModelType] = query.all()
+            return result, num_total_results
         except Exception:
             self.session.rollback()
-        return result, num_total_results
 
     """
     Function to add an instance of the item to the database. Takes in the

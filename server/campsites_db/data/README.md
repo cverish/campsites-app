@@ -1,4 +1,11 @@
 # Data
+
+- Campsites data: [USCampgrounds.info](http://www.uscampgrounds.info/)
+- Canadian Geographical Names: filtered down from [Canadian Government](https://natural-resources.canada.ca/earth-sciences/geography/download-geographical-names-data/9245)
+- US Geographical Names: filtered down from [US Government](https://www.usgs.gov/)
+
+Files for Canadian and US Geographical Names are very large; contact me if you would like them.
+
 ## Table of Contents  
 [Overview](#overview)  
 [Data Structure](#data-structure) 

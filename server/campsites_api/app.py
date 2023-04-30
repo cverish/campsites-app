@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from campsites_api.routers import campsites
+from campsites_api.routers import campsites, places
 
 tags_metadata = [
     {"name": "health", "description": "Health check"},
@@ -49,5 +49,6 @@ def create_app() -> FastAPI:
         return "ok"
 
     app.include_router(campsites.router)
+    app.include_router(places.router)
 
     return app

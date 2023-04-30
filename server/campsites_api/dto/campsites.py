@@ -78,7 +78,7 @@ class CampsiteFilterDTO(BaseModel):
     code__ct: Optional[str]
     name__ct: Optional[str]
     state: Optional[List[CampsiteStateEnum]]
-    country: Optional[CampsiteCountryEnum]
+    country__eq: Optional[CampsiteCountryEnum]
     campsite_type: Optional[List[CampsiteTypeEnum]]
     month_open__lt: Optional[int]
     month_close__gt: Optional[int]

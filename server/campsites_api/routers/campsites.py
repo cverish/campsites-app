@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from pydantic import UUID4
 
-from campsites_api.dto import CampsiteDTO, CampsiteFilterDTO, CampsiteListDTO
+from campsites_api.dto.campsites import CampsiteDTO, CampsiteFilterDTO, CampsiteListDTO
 from campsites_api.services.campsites_service import (
     CampsitesService,
     get_campsites_service,

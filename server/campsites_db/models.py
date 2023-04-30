@@ -184,3 +184,25 @@ class Campsite(Base):
     accepts_reservations: Mapped[Optional[bool]]
     accepts_pets: Mapped[Optional[bool]]
     low_no_fee: Mapped[Optional[bool]]
+
+
+class GeographicalName(Base):
+    __tablename__ = "geographical_names"
+
+    id: Mapped[UUID4] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    govt_id: Mapped[str]
+    name: Mapped[str]
+    name_lower: Mapped[str]
+    generic_category: Mapped[str]
+    generic_term: Mapped[str]
+    county: Mapped[Optional[str]]
+    state_province: Mapped[CampsiteStateEnum]
+    country: Mapped[CampsiteCountryEnum]
+    lat: Mapped[float]
+    lon: Mapped[float]
+    geo: Mapped[Geometry] = mapped_column(
+        Geometry("POINT", srid=4326), default=build_geo_point
+    )
+    priority_order: Mapped[int]

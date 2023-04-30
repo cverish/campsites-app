@@ -49,5 +49,7 @@ typing-extensions==4.5.0
     #   pydantic
     #   sqlalchemy
     #   starlette
-uvicorn==0.21.1
+unidecode==1.3.6
+    # via -r requirements.in
+uvicorn==0.22.0
     # via -r requirements.in
