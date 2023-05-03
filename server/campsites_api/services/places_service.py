@@ -9,7 +9,7 @@ from campsites_db.models import GeographicalName
 from campsites_db.session import get_session
 
 
-class PlacesService(AbstractService[GeographicalName, PlaceDTO, PlaceFilterDTO]):
+class PlacesService(AbstractService[GeographicalName, PlaceDTO, PlaceFilterDTO, None]):
     def __init__(self, session: Session):
         super(PlacesService, self).__init__(GeographicalName, session)
 

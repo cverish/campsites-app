@@ -194,7 +194,7 @@ class GeographicalName(Base):
     )
     govt_id: Mapped[str]
     name: Mapped[str]
-    name_lower: Mapped[str]
+    search_str: Mapped[str]
     generic_category: Mapped[str]
     generic_term: Mapped[str]
     county: Mapped[Optional[str]]

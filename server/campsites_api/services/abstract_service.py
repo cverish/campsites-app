@@ -4,18 +4,44 @@ from fastapi import HTTPException
 from pydantic import UUID4, BaseModel
 from sqlalchemy import func
 from sqlalchemy.orm import Query, Session
+from geoalchemy2.shape import from_shape
+from shapely.geometry import Point
 
 from campsites_db.models import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
 ModelTypeDTO = TypeVar("ModelTypeDTO", bound=BaseModel)
 FilterTypeDTO = TypeVar("FilterTypeDTO", bound=BaseModel)
+DistanceTypeDTO = TypeVar("DistanceTypeDTO", bound=BaseModel)
 
 
-class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
+class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO, DistanceTypeDTO]):
     def __init__(self, model: Type[ModelType], session: Session):
         self.model = model
         self.session = session
+
+    """
+    Function to filter by distance.
+
+    Parameters:
+        distanceFilters: DistanceTypeDTO (value, units, lat, lon)
+
+    Returns:
+        query (Query): sqlalchemy query object with distance filter applied
+    """
+
+    def __distance(self, query: Query, distanceFilters: DistanceTypeDTO):
+        # convert distance to meters
+        dis = distanceFilters.value
+        dis = dis * 1609.344 if distanceFilters.units == "mi" else dis * 1000
+        # build point
+        lat, lon = distanceFilters.lat, distanceFilters.lon
+        point = from_shape(Point(lon, lat), srid=4326)
+
+        query = query.filter(
+            func.ST_DistanceSphere(getattr(self.model, "geo"), point) < dis
+        )
+        return query
 
     """
     Takes in a sqlalchemy Query object and a filter object. Removes filters with
@@ -23,12 +49,14 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
 
     The name of the filters may contain a modifier at the end, preceded with two
     underscores. Allowed modifiers:
-        __eq: filter by NUMBER values equal to a given value
         __lt: filter by values less than or equal to a given value
         __gt: filter by values greater than or equal to a given value
         __ct: filter by string values containing given substring
 
     Filter names (not including modifier with underscores) must exactly match the column name.
+    The only exception to this is the `distance` filter, of type DistanceDTO, containing the
+    values (value, units, lat, lon), used by the __distance function to filter by distance
+    from a given point.
 
     Parameters:
         query (Query): sqlalchemy query object
@@ -61,13 +89,12 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
                             filters[name].lower()
                         )
                     )
+                elif name == "distance":
+                    query = self.__distance(query, filters[name])
                 elif isinstance(filters[name], list):
                     query = query.filter(getattr(self.model, name).in_(filters[name]))
                 else:
-                    filter_value = filters[name].lower()
-                    query = query.filter(
-                        func.lower(getattr(self.model, name)) == filter_value
-                    )
+                    query = query.filter(getattr(self.model, name) == filters[name])
         return query
 
     """
@@ -107,11 +134,8 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
 
     def list(self, filters: FilterTypeDTO) -> Tuple[List[ModelType], int]:
         try:
-            print("?")
             query = self.session.query(self.model)
-            print("??")
             query = self.__filter(query, filters)
-            print("???")
             query = query.order_by(
                 getattr(getattr(self.model, filters["sort_by"]), filters["sort_dir"])()
             )

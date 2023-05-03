@@ -70,6 +70,18 @@ class SortDirEnum(str, Enum):
     desc = "desc"
 
 
+class DistanceUnitEnum(str, Enum):
+    mi = "mi"
+    km = "km"
+
+
+class DistanceFilterDTO(BaseModel):
+    value: Optional[int]
+    units: Optional[DistanceUnitEnum]
+    lat: Optional[float]
+    lon: Optional[float]
+
+
 class CampsiteFilterDTO(BaseModel):
     limit: Optional[int] = 25
     offset: Optional[int] = 0
@@ -78,7 +90,7 @@ class CampsiteFilterDTO(BaseModel):
     code__ct: Optional[str]
     name__ct: Optional[str]
     state: Optional[List[CampsiteStateEnum]]
-    country__eq: Optional[CampsiteCountryEnum]
+    country: Optional[CampsiteCountryEnum]
     campsite_type: Optional[List[CampsiteTypeEnum]]
     month_open__lt: Optional[int]
     month_close__gt: Optional[int]
@@ -101,6 +113,8 @@ class CampsiteFilterDTO(BaseModel):
     accepts_reservations: Optional[bool]
     accepts_pets: Optional[bool]
     low_no_fee: Optional[bool]
+    # distance
+    distance: Optional[DistanceFilterDTO]
 
     # arguments are the query parameters used by FastAPI. Parsing it this way means
     # we don't need to list each query parameter in the router function
@@ -123,6 +137,7 @@ class CampsiteFilterDTO(BaseModel):
         num_campsites__gt: Optional[int] = Query(None),
         num_campsites__lt: Optional[int] = Query(None),
         nearest_town_distance__lt: Optional[float] = Query(None),
+        # amenities
         has_rv_hookup: Optional[bool] = Query(None),
         has_water_hookup: Optional[bool] = Query(None),
         has_electric_hookup: Optional[bool] = Query(None),
@@ -136,9 +151,31 @@ class CampsiteFilterDTO(BaseModel):
         accepts_reservations: Optional[bool] = Query(None),
         accepts_pets: Optional[bool] = Query(None),
         low_no_fee: Optional[bool] = Query(None),
+        # distance
+        distance_value: Optional[float] = Query(None),
+        distance_units: Optional[DistanceUnitEnum] = Query(None),
+        distance_lat: Optional[float] = Query(None),
+        distance_lon: Optional[float] = Query(None),
     ) -> Dict:
         # get the list of all arguments passed
         queries = locals()
-        # remove cls argument
-        queries.pop("cls")
-        return queries
+        # remove cls and distance arguments
+        args_to_pop = [
+            "cls",
+            "distance_value",
+            "distance_units",
+            "distance_lat",
+            "distance_lon",
+        ]
+        for arg in args_to_pop:
+            queries.pop(arg)
+        # build distance filter object if all 4 included
+        distance = None
+        if distance_value and distance_units and distance_lat and distance_lon:
+            distance = DistanceFilterDTO(
+                value=distance_value,
+                units=distance_units,
+                lat=distance_lat,
+                lon=distance_lon,
+            )
+        return {**queries, "distance": distance}

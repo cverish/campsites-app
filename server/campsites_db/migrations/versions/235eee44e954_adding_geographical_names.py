@@ -25,7 +25,7 @@ def upgrade() -> None:
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column("govt_id", sa.String(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
-        sa.Column("name_lower", sa.String(), nullable=False),
+        sa.Column("search_str", sa.String(), nullable=False),
         sa.Column("generic_category", sa.String(), nullable=False),
         sa.Column("generic_term", sa.String(), nullable=False),
         sa.Column("county", sa.String(), nullable=True),
