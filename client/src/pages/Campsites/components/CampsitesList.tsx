@@ -5,24 +5,11 @@ import {
   Divider,
   Grid,
   Pagination,
-  Skeleton,
   Text,
 } from "@mantine/core";
-import { ScrollToTopButton, CampsiteCard, ListActions } from ".";
+import { ScrollToTopButton, CampsiteCard, ListActions, SkeletonCards } from ".";
 import { Campsite, CampsiteFilters, SortByEnum, SortDirEnum } from "models";
 import { useWindowScroll } from "@mantine/hooks";
-
-const SkeletonCards = (props: { numCards: number }): JSX.Element => {
-  return (
-    <Grid>
-      {[...Array(props.numCards)].map((e, i) => (
-        <Grid.Col sm={6} key={i}>
-          <Skeleton height={225} mt="sm" radius="md" />
-        </Grid.Col>
-      ))}
-    </Grid>
-  );
-};
 
 type SortProps = {
   sortBy: SortByEnum;

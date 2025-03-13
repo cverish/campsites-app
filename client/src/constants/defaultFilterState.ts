@@ -28,4 +28,14 @@ export const defaultFilterState: CampsiteFilters = {
   accepts_reservations: null,
   accepts_pets: null,
   low_no_fee: null,
+  distance_value: null,
+  distance_units: null,
+  distance_lat: null,
+  distance_lon: null,
 };
+
+export const defaultPlaceFilterState = {
+  state_province: null,
+  country: null,
+  search_str__ct: null,
+}

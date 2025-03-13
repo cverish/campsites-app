@@ -5,10 +5,11 @@ import { Alert, Anchor, Container, Dialog, Tabs } from "@mantine/core";
 import { Icon } from "@iconify/react";
 import { CampsitesList } from "./components";
 import { getCampsites } from "http/campsites";
-import { CampsiteFilters, CampsiteList, SortByEnum, SortDirEnum } from "models";
-import { defaultFilterState } from "constants/defaultFilterState";
+import { CampsiteFilters, CampsiteList, Place, PlaceFilters, SortByEnum, SortDirEnum } from "models";
+import { defaultFilterState, defaultPlaceFilterState } from "constants/defaultFilterState";
 import { filterNullValuesFromObject } from "utils/filterNullValues";
 import QueryString from "query-string";
+import { getPlaces } from "http/places";
 
 const Campsites = (): JSX.Element => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -18,6 +19,9 @@ const Campsites = (): JSX.Element => {
   const [filterState, setFilterState] = useState<CampsiteFilters>({
     ...defaultFilterState,
   });
+
+  const [placeResults, setPlaceResults] = useState<Place[]>();
+  const [placeFilters, setPlaceFilters] = useState<PlaceFilters>({...defaultPlaceFilterState, search_str__ct: "mont"});
 
   const itemsPerPage = 20;
 
@@ -72,7 +76,25 @@ const Campsites = (): JSX.Element => {
       enabled: page > 0,
       retry: 1,
     }
-  );
+    );
+  
+  // get places data for location dropdown
+  const {
+    data: places,
+    isError: placesError,
+    isFetching: placesIsFetching
+  } = useQuery<Place[], Error>(
+    [
+      "places",
+      ...Object.keys(placeFilters).map(
+        (key) => placeFilters[key as keyof PlaceFilters]
+      ),
+    ],
+    async () => getPlaces(placeFilters),
+    {
+      enabled: !!placeFilters.search_str__ct && placeFilters.search_str__ct.length > 2
+    }
+    )
 
   // determine the number of pages to render in pagination based on results
   useEffect(() => {
