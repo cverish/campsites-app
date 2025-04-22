@@ -4,18 +4,44 @@ from fastapi import HTTPException
 from pydantic import UUID4, BaseModel
 from sqlalchemy import func
 from sqlalchemy.orm import Query, Session
+from geoalchemy2.shape import from_shape
+from shapely.geometry import Point
 
 from campsites_db.models import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
 ModelTypeDTO = TypeVar("ModelTypeDTO", bound=BaseModel)
 FilterTypeDTO = TypeVar("FilterTypeDTO", bound=BaseModel)
+DistanceTypeDTO = TypeVar("DistanceTypeDTO", bound=BaseModel)
 
 
-class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
+class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO, DistanceTypeDTO]):
     def __init__(self, model: Type[ModelType], session: Session):
         self.model = model
         self.session = session
+
+    """
+    Function to filter by distance.
+
+    Parameters:
+        distanceFilters: DistanceTypeDTO (value, units, lat, lon)
+
+    Returns:
+        query (Query): sqlalchemy query object with distance filter applied
+    """
+
+    def __distance(self, query: Query, distanceFilters: DistanceTypeDTO):
+        # convert distance to meters
+        dis = distanceFilters.value
+        dis = dis * 1609.344 if distanceFilters.units == "mi" else dis * 1000
+        # build point
+        lat, lon = distanceFilters.lat, distanceFilters.lon
+        point = from_shape(Point(lon, lat), srid=4326)
+
+        query = query.filter(
+            func.ST_DistanceSphere(getattr(self.model, "geo"), point) < dis
+        )
+        return query
 
     """
     Takes in a sqlalchemy Query object and a filter object. Removes filters with
@@ -28,6 +54,9 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
         __ct: filter by string values containing given substring
 
     Filter names (not including modifier with underscores) must exactly match the column name.
+    The only exception to this is the `distance` filter, of type DistanceDTO, containing the
+    values (value, units, lat, lon), used by the __distance function to filter by distance
+    from a given point.
 
     Parameters:
         query (Query): sqlalchemy query object
@@ -55,12 +84,13 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
                         getattr(self.model, name[:-4]) >= filters[name]
                     )
                 elif name[-4:] == "__ct":
-                    # contains query
                     query = query.filter(
                         func.lower(getattr(self.model, name[:-4])).contains(
                             filters[name].lower()
                         )
                     )
+                elif name == "distance":
+                    query = self.__distance(query, filters[name])
                 elif isinstance(filters[name], list):
                     query = query.filter(getattr(self.model, name).in_(filters[name]))
                 else:
@@ -112,10 +142,10 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
             num_total_results = query.count()
             query = query.limit(filters["limit"])
             query = query.offset(filters["offset"])
-            result: List[ModelType] = query.all()
+            result: List[ModelTypeDTO] = query.all()
+            return result, num_total_results
         except Exception:
             self.session.rollback()
-        return result, num_total_results
 
     """
     Function to add an instance of the item to the database. Takes in the
@@ -130,7 +160,7 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
     """
 
     def create(self, item: ModelTypeDTO) -> ModelType:
-        item: ModelType = self.model(**item.dict())
+        item: ModelType = self.model(**item.model_dump())
         self.session.add(item)
         try:
             self.session.commit()
@@ -151,11 +181,12 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
     """
 
     def bulk_create(self, items: List[ModelTypeDTO]) -> None:
-        items: List[ModelType] = [self.model(**item.dict()) for item in items]
+        items: List[ModelType] = [self.model(**item.model_dump()) for item in items]
         self.session.add_all(items)
         try:
             self.session.commit()
-        except Exception:
+        except Exception as e:
+            print(repr(e))
             self.session.rollback()
             raise HTTPException(status_code=422, detail="Items could not be created.")
 
@@ -176,7 +207,7 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO]):
         db_item = self.get(id)
         if db_item is None:
             raise HTTPException(status_code=404, detail=f"Item with id {id} not found")
-        for key, value in item.dict().items():
+        for key, value in item.model_dump().items():
             # we want to ensure we are not overwriting the ID
             if key != "id":
                 setattr(db_item, key, value)

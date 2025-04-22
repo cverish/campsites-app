@@ -6,7 +6,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 DB_URI = os.environ.get("DATABASE_URI")
 
-engine = create_engine(DB_URI, pool_pre_ping=True)
+engine = create_engine(DB_URI, pool_pre_ping=True, echo=True)
 
 
 @lru_cache

@@ -1,25 +1,21 @@
 env:
 	touch .env
 
+compile-requirements:
+	pip-compile -U requirements.in -o requirements.txt
+	pip-compile -U requirements_test.in -o requirements_test.txt
+
 requirements:
 	pip install -r requirements.txt
 
-requirements-test:
+requirements-test: requirements
 	pip install -r requirements_test.txt
 
 build: env
 	docker build . -t campsites-api
 
-black:
-	black .
-
-isort:
-	isort .
-
-flake8:
-	flake8
-
-lint: flake8 isort black
+lint:
+	ruff format && ruff lint
 
 db-current:
 	alembic current

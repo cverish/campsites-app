@@ -1,11 +1,15 @@
 import uuid
 from enum import Enum
+from typing import Optional
 
-import sqlalchemy as sa
+from geoalchemy2 import Geometry
+from pydantic import UUID4
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    pass
 
 
 class CampsiteStateEnum(str, Enum):
@@ -130,38 +134,75 @@ class ToiletTypeEnum(str, Enum):
     pit = "pit"
 
 
+def build_geo_point(context):
+    """
+    Function fed to 'geo' column's 'default' to build the point
+    representation of the latitude and longitude
+    """
+    lon = context.get_current_parameters()["lon"]
+    lat = context.get_current_parameters()["lat"]
+    return f"POINT ({lon} {lat})"
+
+
 class Campsite(Base):
     __tablename__ = "campsites"
 
-    id = sa.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    code = sa.Column(sa.String, nullable=True)
-    name = sa.Column(sa.String, nullable=False)
-    state = sa.Column(sa.Enum(CampsiteStateEnum), nullable=False)
-    country = sa.Column(sa.Enum(CampsiteCountryEnum), nullable=False)
-    campsite_type = sa.Column(sa.Enum(CampsiteTypeEnum), nullable=True)
-    lon = sa.Column(sa.DOUBLE_PRECISION, nullable=False)
-    lat = sa.Column(sa.DOUBLE_PRECISION, nullable=False)
-    composite = sa.Column(sa.Text, nullable=False)
-    comments = sa.Column(sa.Text, nullable=True)
-    phone = sa.Column(sa.String, nullable=True)
-    month_open = sa.Column(sa.Integer, nullable=True)
-    month_close = sa.Column(sa.Integer, nullable=True)
-    elevation_ft = sa.Column(sa.Integer, nullable=True)
-    num_campsites = sa.Column(sa.Integer, nullable=True)
-    nearest_town = sa.Column(sa.String, nullable=True)
-    nearest_town_distance = sa.Column(sa.Float, nullable=True)
-    nearest_town_bearing = sa.Column(sa.Enum(BearingEnum), nullable=True)
+    id: Mapped[UUID4] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    code: Mapped[Optional[str]]
+    name: Mapped[str]
+    state: Mapped[CampsiteStateEnum]
+    country: Mapped[CampsiteCountryEnum]
+    campsite_type: Mapped[Optional[CampsiteTypeEnum]]
+    lon: Mapped[float]
+    lat: Mapped[float]
+    geo: Mapped[Geometry] = mapped_column(
+        Geometry("POINT", srid=4326), default=build_geo_point
+    )
+    composite: Mapped[str]
+    comments: Mapped[Optional[str]]
+    phone: Mapped[Optional[str]]
+    month_open: Mapped[Optional[int]]
+    month_close: Mapped[Optional[int]]
+    elevation_ft: Mapped[Optional[int]]
+    num_campsites: Mapped[Optional[int]]
+    nearest_town: Mapped[Optional[str]]
+    nearest_town_distance: Mapped[Optional[float]]
+    nearest_town_bearing: Mapped[Optional[BearingEnum]]
     # amenities
-    has_rv_hookup = sa.Column(sa.Boolean, nullable=True)
-    has_water_hookup = sa.Column(sa.Boolean, nullable=True)
-    has_electric_hookup = sa.Column(sa.Boolean, nullable=True)
-    has_sewer_hookup = sa.Column(sa.Boolean, nullable=True)
-    has_sanitary_dump = sa.Column(sa.Boolean, nullable=True)
-    max_rv_length = sa.Column(sa.Integer, nullable=True)
-    has_toilets = sa.Column(sa.Boolean, nullable=True)
-    toilet_type = sa.Column(sa.Enum(ToiletTypeEnum), nullable=True)
-    has_drinking_water = sa.Column(sa.Boolean, nullable=True)
-    has_showers = sa.Column(sa.Boolean, nullable=True)
-    accepts_reservations = sa.Column(sa.Boolean, nullable=True)
-    accepts_pets = sa.Column(sa.Boolean, nullable=True)
-    low_no_fee = sa.Column(sa.Boolean, nullable=True)
+    has_rv_hookup: Mapped[Optional[bool]]
+    has_water_hookup: Mapped[Optional[bool]]
+    has_electric_hookup: Mapped[Optional[bool]]
+    has_sewer_hookup: Mapped[Optional[bool]]
+    has_sanitary_dump: Mapped[Optional[bool]]
+    max_rv_length: Mapped[Optional[int]]
+    has_toilets: Mapped[Optional[bool]]
+    toilet_type: Mapped[Optional[ToiletTypeEnum]]
+    has_drinking_water: Mapped[Optional[bool]]
+    has_showers: Mapped[Optional[bool]]
+    accepts_reservations: Mapped[Optional[bool]]
+    accepts_pets: Mapped[Optional[bool]]
+    low_no_fee: Mapped[Optional[bool]]
+
+
+class GeographicalName(Base):
+    __tablename__ = "geographical_names"
+
+    id: Mapped[UUID4] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    govt_id: Mapped[str]
+    name: Mapped[str]
+    search_str: Mapped[str]
+    generic_category: Mapped[str]
+    generic_term: Mapped[str]
+    county: Mapped[Optional[str]]
+    state_province: Mapped[CampsiteStateEnum]
+    country: Mapped[CampsiteCountryEnum]
+    lat: Mapped[float]
+    lon: Mapped[float]
+    geo: Mapped[Geometry] = mapped_column(
+        Geometry("POINT", srid=4326), default=build_geo_point
+    )
+    priority_order: Mapped[int]

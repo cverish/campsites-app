@@ -5,7 +5,7 @@ from typing import List
 from fastapi import HTTPException, UploadFile
 
 import campsites_api.utils.process_data_utils as ut
-from campsites_api.dto import CampsiteDTO
+from campsites_api.dto.campsites import CampsiteDTO
 
 
 def process_data(file: UploadFile) -> List[CampsiteDTO]:

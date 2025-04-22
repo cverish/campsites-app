@@ -139,6 +139,7 @@ export type Campsite = {
   nearest_town: string | null;
   nearest_town_distance: number | null;
   nearest_town_bearing: BearingEnum | null;
+  // amenities
   has_rv_hookup: boolean | null;
   has_water_hookup: boolean | null;
   has_electric_hookup: boolean | null;
@@ -172,6 +173,11 @@ export enum SortDirEnum {
   DESC = "desc",
 }
 
+export enum DistanceUnitEnum {
+  mi = "mi",
+  km = "km"
+}
+
 export type CampsiteFilters = {
   sort_by: SortByEnum;
   sort_dir: SortDirEnum;
@@ -187,6 +193,7 @@ export type CampsiteFilters = {
   num_campsites__gt: number | null;
   num_campsites__lt: number | null;
   nearest_town_distance__lt: number | null;
+  // amenities
   has_rv_hookup: boolean | null;
   has_water_hookup: boolean | null;
   has_electric_hookup: boolean | null;
@@ -200,4 +207,9 @@ export type CampsiteFilters = {
   accepts_reservations: boolean | null;
   accepts_pets: boolean | null;
   low_no_fee: boolean | null;
+  // location
+  distance_value: number | null,
+  distance_units: DistanceUnitEnum | null,
+  distance_lat: number | null,
+  distance_lon: number | null,
 };
