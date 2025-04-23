@@ -15,7 +15,7 @@ build: env
 	docker build . -t campsites-api
 
 lint:
-	ruff format && ruff check
+	ruff format && ruff check --extend-select T201
 
 db-current:
 	alembic current

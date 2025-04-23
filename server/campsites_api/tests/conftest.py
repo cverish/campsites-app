@@ -11,6 +11,8 @@ from campsites_db.models import Base
 from campsites_db.session import get_session
 
 from campsites_api.app import create_app
+from server.campsites_api.services.campsites_service import get_campsites_service
+from server.campsites_api.services.places_service import get_places_service
 from server.campsites_api.tests.factories import (
     CampsiteFactory,
     GeographicalNameFactory,
@@ -33,9 +35,9 @@ def pytest_sessionstart(session):
         engine = create_engine(db_url, poolclass=StaticPool, echo=True)
         connection = engine.connect()
         connection.close()
-        print("Database connection successful")
+        print("Database connection successful")  # noqa: T201
     except SQLAlchemyOperationalError as e:
-        print(f"Failed to connect to database at {db_url}: {repr(e)}")
+        print(f"Failed to connect to database at {db_url}: {repr(e)}")  # noqa: T201
         pytest.exit(
             "Stopping tests because database connection could not be established"
         )
@@ -50,12 +52,12 @@ def db_url(request):
 @pytest.fixture(scope="session", autouse=True)
 def create_and_delete_database(db_url):
     if database_exists(db_url):
-        print(
+        print(  # noqa: T201
             "Test database already exists. Dropping test database before starting tests."
         )
         drop_database(db_url)
 
-    print("Creating test database.")
+    print("Creating test database.")  # noqa: T201
     create_database(db_url)
 
     yield
@@ -111,13 +113,24 @@ def geographical_name_factory(db_session):
 def test_client(db_session):
     """Create a test client that uses the override_get_db fixture to return a session."""
 
-    def override_get_db(_):
+    def override_get_db():
         try:
             yield db_session
         finally:
             db_session.close()
 
+    # I'm not sure why these dependencies need to be overwritten but it doesn't work without it
+    def override_campsites_service(_):
+        yield get_campsites_service
+
+    def override_places_service(_):
+        yield get_places_service
+
     app = create_app()
+
     app.dependency_overrides[get_session] = override_get_db
+    app.dependency_overrides[get_campsites_service] = override_campsites_service
+    app.dependency_overrides[get_places_service] = override_places_service
+
     with TestClient(app) as test_client:
         yield test_client

@@ -1,4 +1,4 @@
-from typing import List
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from pydantic import UUID4
@@ -15,8 +15,8 @@ router = APIRouter(prefix="/campsites")
 
 @router.get("", response_model=CampsiteListDTO, tags=["GET"])
 async def list_campsites(
-    filters: CampsiteFilterDTO = Depends(CampsiteFilterDTO.parser),
-    campsites_service: CampsitesService = Depends(get_campsites_service),
+    filters: Annotated[CampsiteFilterDTO, Depends(CampsiteFilterDTO.parser)],
+    campsites_service: Annotated[CampsitesService, Depends(get_campsites_service)],
 ):
     campsites, count = campsites_service.list(filters)
     return CampsiteListDTO(items=campsites, num_total_results=count)
@@ -25,16 +25,16 @@ async def list_campsites(
 @router.post("/upload", tags=["POST"])
 async def upload_campsites(
     csv_file: UploadFile,
-    campsites_service: CampsitesService = Depends(get_campsites_service),
+    campsites_service: Annotated[CampsitesService, Depends(get_campsites_service)],
 ):
-    campsites: List[CampsiteDTO] = process_data(csv_file)
+    campsites: list[CampsiteDTO] = process_data(csv_file)
     campsites_service.bulk_create(campsites)
 
 
 @router.post("/campsite", response_model=CampsiteDTO, tags=["POST"])
 async def create_campsite(
     campsite: CampsiteDTO,
-    campsites_service: CampsitesService = Depends(get_campsites_service),
+    campsites_service: Annotated[CampsitesService, Depends(get_campsites_service)],
 ):
     return campsites_service.create(campsite)
 
@@ -42,7 +42,7 @@ async def create_campsite(
 @router.get("/campsite/{campsite_uuid4}", response_model=CampsiteDTO, tags=["GET"])
 async def get_campsite(
     campsite_uuid4: UUID4,
-    campsites_service: CampsitesService = Depends(get_campsites_service),
+    campsites_service: Annotated[CampsitesService, Depends(get_campsites_service)],
 ):
     try:
         campsite = campsites_service.get(campsite_uuid4)
@@ -55,7 +55,7 @@ async def get_campsite(
 async def update_campsite(
     campsite_uuid4: UUID4,
     campsite: CampsiteDTO,
-    campsites_service: CampsitesService = Depends(get_campsites_service),
+    campsites_service: Annotated[CampsitesService, Depends(get_campsites_service)],
 ):
     return campsites_service.update(campsite_uuid4, campsite)
 
@@ -63,6 +63,6 @@ async def update_campsite(
 @router.delete("/campsite/{campsite_uuid4}", tags=["DELETE"])
 async def delete_campsite(
     campsite_uuid4: UUID4,
-    campsites_service: CampsitesService = Depends(get_campsites_service),
+    campsites_service: Annotated[CampsitesService, Depends(get_campsites_service)],
 ):
     campsites_service.delete(campsite_uuid4)

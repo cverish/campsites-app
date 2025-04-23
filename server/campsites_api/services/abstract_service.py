@@ -24,18 +24,18 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO, DistanceTy
     Function to filter by distance.
 
     Parameters:
-        distanceFilters: DistanceTypeDTO (value, units, lat, lon)
+        distance_filters: DistanceTypeDTO (value, units, lat, lon)
 
     Returns:
         query (Query): sqlalchemy query object with distance filter applied
     """
 
-    def __distance(self, query: Query, distanceFilters: DistanceTypeDTO):
+    def __distance(self, query: Query, distance_filters: DistanceTypeDTO):
         # convert distance to meters
-        dis = distanceFilters.value
-        dis = dis * 1609.344 if distanceFilters.units == "mi" else dis * 1000
+        dis = distance_filters.value
+        dis = dis * 1609.344 if distance_filters.units == "mi" else dis * 1000
         # build point
-        lat, lon = distanceFilters.lat, distanceFilters.lon
+        lat, lon = distance_filters.lat, distance_filters.lon
         point = from_shape(Point(lon, lat), srid=4326)
 
         query = query.filter(
@@ -185,8 +185,7 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO, DistanceTy
         self.session.add_all(items)
         try:
             self.session.commit()
-        except Exception as e:
-            print(repr(e))
+        except Exception:
             self.session.rollback()
             raise HTTPException(status_code=422, detail="Items could not be created.")
 
