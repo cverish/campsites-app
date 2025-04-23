@@ -1,3 +1,4 @@
+import warnings
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
@@ -13,7 +14,7 @@ from campsites_db.session import get_session
 from campsites_api.app import create_app
 from server.campsites_api.services.campsites_service import get_campsites_service
 from server.campsites_api.services.places_service import get_places_service
-from server.campsites_api.tests.factories import (
+from campsites_api.tests.factories import (
     CampsiteFactory,
     GeographicalNameFactory,
 )
@@ -79,7 +80,9 @@ def db_session(db_url):
         connection.commit()
 
     # Create a sessionmaker to manage sessions
-    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    TestingSessionLocal = sessionmaker(
+        autocommit=False, autoflush=False, expire_on_commit=False, bind=engine
+    )
 
     # Create tables in the database
     Base.metadata.create_all(bind=engine)
@@ -88,7 +91,13 @@ def db_session(db_url):
     session = TestingSessionLocal(bind=connection)
     yield session
     session.close()
-    transaction.rollback()
+    with warnings.catch_warnings():
+        # session might have already been rolled back, such as in case of 404.
+        # we don't need to care about this specific warning when running tests.
+        warnings.filterwarnings(
+            "ignore", message="transaction already deassociated from connection"
+        )
+        transaction.rollback()
     connection.close()
 
 

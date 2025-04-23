@@ -144,8 +144,9 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO, DistanceTy
             query = query.offset(filters["offset"])
             result: List[ModelTypeDTO] = query.all()
             return result, num_total_results
-        except Exception:
+        except Exception as e:
             self.session.rollback()
+            raise e
 
     """
     Function to add an instance of the item to the database. Takes in the
@@ -212,8 +213,9 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO, DistanceTy
                 setattr(db_item, key, value)
         try:
             self.session.commit()
-        except Exception:
+        except Exception as e:
             self.session.rollback()
+            raise e
         return db_item
 
     """
@@ -231,5 +233,6 @@ class AbstractService(Generic[ModelType, ModelTypeDTO, FilterTypeDTO, DistanceTy
         try:
             self.session.delete(item)
             self.session.commit()
-        except Exception:
+        except Exception as e:
             self.session.rollback()
+            raise e
