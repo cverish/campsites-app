@@ -18,3 +18,6 @@ bash:
 
 psql-terminal:
 	psql -h 127.0.0.1 -p 5555 -d postgres -U postgres
+
+test:
+	docker exec -it campsites_server pytest

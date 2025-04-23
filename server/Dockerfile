@@ -13,6 +13,6 @@ WORKDIR /workspace
 ENV PATH="/opt/server/bin:${PATH}"
 
 ENV PYTHONUNBUFFERED 1
-ENV PYTHONPATH /workspace
+ENV PYTHONPATH /workspace/server
 
 WORKDIR /workspace/server

@@ -110,7 +110,29 @@ $ make psql-terminal
 as a shortcut in local development; you will still be prompted for a password.
 
 ## Testing
-TODO
+I've begun work on adding test suites for the API within the docker container. The test suite spins up a fresh test database for the entire test suite, and each test function runs within its own session that is wiped before the next test. To run tests, ensure that the docker container is running with `make start`, then run
+
+```bash
+$ make test
+```
+
+Rather than using static fixtures for objects, I'm using model factories to generate the necessary objects for each test. Because of how the database fixtures are set up, these factories cannot be called directly; instead, the name of the factory fixture must be passed to the test function. In essence,
+
+```python
+# doesn't work
+from campsites_api.tests.factories import CampsiteFactory
+
+def my_test():
+  c = CampsiteFactory.create()
+```
+
+will throw a `RuntimeError: No session provided`. One *should* be able to fix this by setting the `factory_class._meta.sqlalchemy_session` within the `db_session` but it wasn't being passed properly. Instead, the factory fixture should be used:
+
+```python
+# use this instead
+def my_test(campsite_factory):
+  c = campsite_factory.create()
+```
 
 ## Project Status
 This project is still a work-in-progress, with basic backend functionality completed and the frontend in active development.
@@ -120,7 +142,7 @@ This project is still a work-in-progress, with basic backend functionality compl
   - [x] basic endpoints
   - [x] file upload
   - [x] campsite list basic filtering and sorting
-  - [ ] geolocation support
+  - [x] geolocation support
   - [ ] ability to create trips
 - [ ] frontend
   - [x] list view
@@ -130,10 +152,10 @@ This project is still a work-in-progress, with basic backend functionality compl
   - [ ] trip planner
 - [ ] infrastructure
   - [ ] apply alembic migration automatically in the docker container
-  - [ ] more functional `Makefile`'s
+  - [x] more functional `Makefile`'s
 - [ ] Good coding practices
   - [ ] tests
-  - [ ] linting
+  - [x] linting
 
 ## Credits
 - Data gratefully pulled from [USCampgrounds](http://www.uscampgrounds.info/).
